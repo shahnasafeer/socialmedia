@@ -1,0 +1,129 @@
+{% load static %}
+<!-------------------------------Navigation Starts------------------>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<style>
+    .dropdown-menu {
+        background-color: #fff; /* Change background color */
+        border: none;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); /* Add subtle shadow */
+        position: absolute;
+        right: 0;
+        top: 100%;
+        opacity: 0; /* Hide by default */
+        transition: opacity 0.3s ease;
+        z-index: 999; /* Ensure it's above other elements */
+    }
+    .dropdown-menu a {
+        color: #333; /* Adjust text color */
+        text-decoration: none;
+        display: block;
+        padding: 10px;
+        transition: background-color 0.3s ease;
+    }
+    .dropdown-menu a:hover {
+        background-color: #f8f9fa;
+    }
+    .dropdown:hover .dropdown-menu {
+        opacity: 1; /* Show dropdown on hover */
+    }
+    .search-icon {
+        position: absolute;
+        right: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        cursor: pointer;
+        color: #999;
+    }
+    #searchResults {
+        max-height: 200px; /* Set max height for search results */
+        overflow-y: auto; /* Make the container scrollable */
+        border: 1px solid #ced4da; /* Add border for better visibility */
+        border-radius: 4px; /* Optional: Add border radius */
+        position: absolute;
+        right: 0;
+        top: calc(100% + 10px); /* Adjust positioning */
+        background-color: #fff;
+        width: 200px; /* Set width for better appearance */
+        padding: 0;
+        margin: 0;
+        list-style: none;
+        z-index: 1000; /* Ensure it's above other content */
+    }
+    #searchResults li {
+        padding: 10px;
+        border-bottom: 1px solid #ced4da; /* Add separator between items */
+        cursor: pointer; /* Add pointer cursor */
+    }
+    #searchResults li:hover {
+        background-color: #f8f9fa; /* Highlight on hover */
+    }
+    #searchResults li:last-child {
+        border-bottom: none; /* Remove border for last item */
+    }
+</style>
+{% if request.user.is_authenticated %}
+<nav class="navbar navbar-expand-md navbar-dark mb-4" style="background-color:#3097D1">
+    <a href="index.html" class="navbar-brand"><img src="{% static 'img/brand-white.png' %}" alt="logo" class="img-fluid" width="80px" height="100px"></a>
+
+    <button class="navbar-toggler" data-toggle="collapse" data-target="#responsive"><span class="navbar-toggler-icon"></span></button>
+
+    <div class="collapse navbar-collapse" id="responsive">
+        <ul class="navbar-nav mr-auto text-capitalize">
+            <li class="nav-item"><a href="{% url 'index' %}" class="nav-link active"> <i class="fas fa-home ml-3 d-md-block"></i></a></li>
+            <li class="nav-item"><a href="#modalview" class="nav-link" data-toggle="modal"><i class="fas fa-envelope ml-3 d-md-block"></i> </a></li>
+            <li class="nav-item"><a href="{% url 'posts' %}" class="nav-link active"> <i class="fas fa-plus ml-3 d-md-block"></i></a></li>
+            <li class="nav-item"><a href="{% url 'signout' %}" class="nav-link"><i class="fas fa-sign-out-alt"></i> </a></li>
+            <li class="nav-item"><a href="#" class="nav-link d-md-none">Growl</a></li>
+        </ul>
+        <form id="searchForm" class="position-relative">
+            <input type="text" id="searchInput" class="form-control" placeholder="Search...">
+            <ul id="searchResults"></ul>
+            <span class="fas fa-search search-icon"></span> <!-- Search icon -->
+        </form>      
+        <a href="{% url 'notification' %}" class="text-decoration-none" style="color:#CBE4F2;font-size:26px;"><i class="far fa-bell ml-3 d-none d-md-block"></i></a> 
+        
+        <a href="{% url 'profile' %}">
+                <img id="dropdown-toggle" src="{{ request.user.profile.image.url }}" alt="" class="rounded-circle ml-3 d-none d-md-block" width="32px" height="32px">
+        </a>
+        
+    </div>
+</nav>
+<script>
+$(document).ready(function() {
+    $('#searchInput').on('input', function() {
+        var query = $(this).val().trim();
+        if (query !== '') {
+            $.ajax({
+                type: 'GET',
+                url: '/search-users/',
+                data: {'query': query},
+                success: function(response) {
+                    $('#searchResults').empty();
+                    if (response.length > 0) {
+                        response.forEach(function(result) {
+                            // Check if the user is the current user
+                            if (result.username !== "{{ request.user.username }}") {
+                                var listItem = $('<li>').text(result.username).appendTo('#searchResults');
+                                // Add click event to each search result item
+                                listItem.click(function() {
+                                    var username = encodeURIComponent(result.username); // Encode username to handle special characters
+                                    window.location.href = '/profile/' + username; // Use the correct URL pattern for user profiles
+                                });
+                            }
+                        });
+                    } else {
+                        $('#searchResults').append('<li>No results found</li>');
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error(xhr.responseText);
+                }
+            });
+        } else {
+            $('#searchResults').empty();
+        }
+    });
+});
+
+</script>
+{% endif %}

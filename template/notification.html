@@ -1,0 +1,299 @@
+{% extends 'layout/base.html' %}
+{% load static %}
+{% block content %}
+         <!---------------------------MOdal Section  satrts------------------->
+         <style>
+            #messageList {
+                list-style-type: none;
+                padding: 0;
+            }
+        
+            #messageList li {
+                margin-bottom: 10px;
+                border-bottom: 1px solid #ccc;
+                padding-bottom: 10px;
+                font-size: 18px; /* Adjust the font size as needed */
+            }
+        
+            #messageList li img {
+                margin-right: 10px;
+                border-radius: 50%;
+            }
+        
+            #messageList li strong {
+                font-weight: bold; /* Make the username bold */
+            }
+        </style>
+        
+        <div class="modal fade" id="modalview">
+            <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <div class="modal-title h4">Messages</div>
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        <ul class="list-unstyled" id="messageList">
+                            <li>No messages found.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+        <script>
+            $(document).ready(function() {
+                $('#modalview').on('shown.bs.modal', function (e) {
+                    $.ajax({
+                        type: 'GET',
+                        url: '/inbox/{{ request.user.id }}/messages/', // Adjusted URL to fetch messages for the current user
+                        success: function(response) {
+                            $('#messageList').empty();  
+                            if (response.length === 0) {
+                                $('#messageList').append('<li>No messages found.</li>');
+                            } else {
+                                response.forEach(function(message) {
+                                    $('#messageList').append(
+                                        '<li>' +
+                                        '<img src="' + message.sender.profile.image.url + '" alt="' + message.sender.username + '" width="30" height="30">' +
+                                        '<a href="/profile/' + message.sender.username + '">' + message.sender.username + '</a><br>' +
+                                        message.message_content + '<br>' +
+                                        message.timestamp + 
+                                        '</li>'
+                                    );
+                                });
+                            }
+                        },
+                        error: function(xhr, status, error) {
+                            console.error(xhr.responseText);
+                            $('#messageList').empty().append('<li>Error loading messages.</li>');
+                        }
+                    });
+                });
+            });
+        </script>
+        
+        
+        <!-------------------------------MOdal Ends---------------------------->
+
+
+
+
+    <!------------------------------(Starts Column SEction)-------------------->
+
+
+    <div class="container mt-3">
+        <div class="row">
+
+
+
+
+<!-----------------------------------------(Satrt Left Column)------------------------------->
+            <div class="col-12 col-lg-3">
+
+
+                <div class="left-column">
+
+
+                    <div class="card mb-4 shadow-sm">
+
+                    
+                        <a href="{% url 'user_list' %}" class="text-decoration-none text-dark hover-media">
+                            <div class="card-body d-flex justify-content-between">
+                                <span>Message</span>
+                                <span><i class="fas fa-chevron-right"></i></span>
+                            </div>
+                        </a>
+            
+                    <hr class="m-0">
+                        <a href="#" class="text-decoration-none text-dark hover-media"> 
+
+                        <div class="card-body d-flex justify-content-between">
+                           
+                            <span> Mentions</span>   <span><i class="fas fa-chevron-right"></i></span> 
+                       
+                    </div>
+
+                </a>
+
+                    </div>
+
+
+
+
+
+
+                    <div class="card shadow-sm mb-4">
+
+                        <div class="card-body">
+                            <h5 class="card-title">Photos<small class="ml-2"><a href="#"></a></small></h5>
+                            <div class="row">
+                                {% for post in notification.user_posts %}
+                                <div class="col-6 p-1">
+                                    <a href="{{ post.image.url }}" data-lightbox="id"><img src="{{ post.image.url }}" alt="img" class="img-fluid my-2"></a>
+                                    <p><a href="{% url 'edit_post' pk=post.pk %}"><i class="far fa-edit"></i></a>
+                                        
+                                        <a href="{% url 'delete_post' pk=post.pk %}" class="text-danger"><i class="far fa-trash-alt"></i></a></p>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        
+                         
+                            </div>
+                            <div class="card mb-3 shadow-sm">
+                                <div class="card-body">
+                                    <h5 class="card-title">Trending searches <small><a href="#">changes</a></small></h5>
+
+
+                                    <ul class="list-unstyled">
+
+                                        <li class="pb-2"> <a href="" >#Bootstrap</a> </li>
+                                        <li class="pb-2"> <a href="" >#Bootstrap</a> </li>
+                                        <li class="pb-2"> <a href="" >#Mdo for pres</a> </li>
+                                        <li class="pb-2"> <a href="" >#Bootstrap</a> </li>
+                                        <li class="pb-2"> <a href="" >#Mdo for pres</a> </li>
+                                        <li class="pb-2"> <a href="" >#Bootstrap</a> </li>
+                                        <li class="pb-2"> <a href="" >#Bootstrap</a> </li>
+                                        <li class="pb-2"> <a href="" >#Bootstrap</a> </li>
+                                        <li class="pb-2"> <a href="" >#Bootstrap</a> </li>
+                                        <li class="pb-2"> <a href="" >#Bootstrap</a> </li>
+                                        <li class="pb-2"> <a href="" >#Bootstrap</a> </li>
+
+                                        
+
+                                       
+
+                                    </ul>
+                                    
+                                </div>
+                            </div>
+
+
+
+
+
+
+
+
+
+
+
+
+                </div>
+
+            </div>
+     <!-----------------------------------------(End Left Column)------------------------------->
+<!------------------------------------------------(Satrt Middle Column)---------------------------->
+<div class="col-12 col-lg-6">
+    <div class="middle-column">
+        <div class="card shadow-sm">
+            <div class="card-header bg-transparent">
+                <h4 class="card-title">Notifications</h4>
+            </div>
+            <div class="card-body">
+                {% for notification in notifications %}
+                <div class="media">
+                    {% if notification.type == 'post' %}
+                        <i class="fas fa-camera mx-2 mt-1"></i>
+                    {% elif notification.type == 'mention' %}
+                        <i class="fas fa-at mx-2 mt-1"></i>
+                    {% elif notification.type == 'comment' %}
+                        <i class="fas fa-comment mx-2 mt-1"></i>
+                    {% elif notification.type == 'like' %}
+                        <i class="fas fa-thumbs-up mx-2 mt-1"></i>
+                    {% elif notification.type == 'follow' %}
+                        <i class="fas fa-user-plus mx-2 mt-1"></i>  
+                    {% endif %}
+                    <div class="media-body">
+                        <p class="h5 mr-2">
+                            <a href="#" class="text-info">{{ notification.user }}</a> {{ notification.message }}
+                        </p>
+                        {% if notification.post %}
+                            <a href="{{ notification.post.get_absolute_url }}">
+                                <img src="{{ notification.post.image.url }}" alt="Post Image" class="img-fluid shadow-sm img-thumbnail mt-3">
+                            </a>
+                        {% endif %}
+                    </div>
+                    <small class="mr-2 text-muted">{{ notification.created_at }}</small>
+                </div>                
+                <hr>
+            {% endfor %}
+            </div>
+            
+        </div>
+    </div>
+</div>
+
+
+<!------------------------------------------------(End Middle Column)---------------------------->
+
+
+<!------------------------------------------------(Start right Column)---------------------------->
+                <div class="col-12 col-lg-3">
+
+
+                    <div class="right-column">
+
+
+                            <div class="card shadow-sm mb-4">
+
+                                    <div class="card-body">
+                        
+                                        <div class="card-body">
+                                            <h6 class="card-title">Suggested for You<a href="#" class="ml-1"></a></h6>
+                                            <div class="row no-gutters d-none d-lg-flex">
+                                                {% for user in notification.suggested_users %}
+                                                    {% if user != request.user and not user.is_superuser %}
+                                                    
+                                                        <div class="col-6 p-1">                                
+                                                            <a href="{% url 'profile' %}">
+                                                            <img src="{{ user.profile.image.url }}" alt="Profile Picture" class="rounded-circle mb-4" width="80px" height="80px">
+                                                        </a></div>
+                                                        <div class="col-6 p-1 text-left">
+                                                            <h6>{{ user.username }}</h6>
+                                                            <a href="#" class="btn btn-outline-info btn-sm mb-3"><i class="fas fa-user-friends"></i>Follow </a>
+                                                        </div>
+                                                    {% endif %}
+                                                {% endfor %}
+                                            </div>
+                                            </div>
+                        
+                                    </div>
+                                </div>
+                        
+                                <div class="card shadow-sm">
+                                    <div class="card-body">
+                                        <p>&copy; 2018 Bootstrap
+                        
+                        
+                        
+                                                <a href="#">About</a>
+                                                <a href="#">Help</a>
+                                                <a href="#">Terms</a>
+                                                <a href="#">Privacy</a>
+                                                <a href="#">Cookies</a>
+                                                <a href="#">Ads </a>
+                                                <a href="#">Info</a>
+                                                <a href="#">Brand</a>
+                                                <a href="#">Blog</a>
+                                                <a href="#">Status</a>
+                                                <a href="#">Apps</a>
+                                                <a href="#">Jobs</a>
+                                                <a href="#">Advertise</a>                                                         
+                                        </p>
+                                    </div>
+                        
+                                </div>
+                    </div>
+                </div>
+            </div>
+    </div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.slim.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/js/bootstrap.min.js"></script>
+</body>
+</html>
+{% endblock %}

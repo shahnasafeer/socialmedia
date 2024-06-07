@@ -1,0 +1,72 @@
+{% extends 'layout/base.html' %}
+{% load static %}
+{% block content %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>signin</title>
+  <link rel='stylesheet' href='https://use.fontawesome.com/releases/v5.2.0/css/all.css'>
+  <link rel='stylesheet' href='https://use.fontawesome.com/releases/v5.2.0/css/fontawesome.css'>
+  <link rel="stylesheet" href="{% static 'stylee.css' %}">
+  <style>
+     .section-title {
+      text-align: center;
+      margin-bottom: 40px; 
+      color: #5D54A4; 
+      font-weight: bold;
+      font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+      margin-top: 40px; 
+      font-size: 28px; 
+      text-transform: uppercase;
+      letter-spacing: 2px; 
+      text-shadow: 1px 1px 2px #000; 
+    }
+    a {
+      color: black;
+      font-style: italic; 
+    }
+
+    a:hover {
+      color: black; 
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <div class="screen">
+    <div class="screen__content">
+      <form role="form" method="post" action="{% url 'signin' %}">
+        <div class="section-title wow fadeInUp" data-wow-delay="0.4s">
+          <h2>LOGIN</h2>
+        </div>
+        <div class="login__field">
+          <div class="col-md-8 col-sm-8">
+            {% csrf_token %}
+            <div class="login__field">
+              {{ form.as_p }}
+            </div>
+            {% if form.errors %}
+            <div class="alert-danger">{{form.errors}}</div>
+            {% endif %}
+            <button class="button login__submit">
+              <span class="button__text">Log In Now</span>
+              <i class="button__icon fas fa-chevron-right"></i>
+            </button><br>
+            <p>Not Registered Yet? <a href="{% url 'signup' %}">Sign Up</a></p>
+          </div>
+        </div>
+      </form>
+    </div>
+    <div class="screen__background">
+      <span class="screen__background__shape screen__background__shape4"></span>
+      <span class="screen__background__shape screen__background__shape3"></span>
+      <span class="screen__background__shape screen__background__shape2"></span>
+      <span class="screen__background__shape screen__background__shape1"></span>
+    </div>
+  </div>
+</div>
+</body>
+</html>
+
+{% endblock %}

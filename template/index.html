@@ -1,0 +1,483 @@
+{% extends 'layout/base.html' %}
+{% load static %}
+{% block content %}
+
+    <!---------------------------MOdal Section  satrts------------------->
+    <style>
+        #messageList {
+            list-style-type: none;
+            padding: 0;
+        }
+    
+        #messageList li {
+            margin-bottom: 10px;
+            border-bottom: 1px solid #ccc;
+            padding-bottom: 10px;
+            font-size: 18px; /* Adjust the font size as needed */
+        }
+    
+        #messageList li img {
+            margin-right: 10px;
+            border-radius: 50%;
+        }
+    
+        #messageList li strong {
+            font-weight: bold; /* Make the username bold */
+        }
+    </style>
+    
+    <div class="modal fade" id="modalview">
+        <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <div class="modal-title h4">Messages</div>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <ul class="list-unstyled" id="messageList">
+                        <li>No messages found.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('#modalview').on('shown.bs.modal', function (e) {
+                $.ajax({
+                    type: 'GET',
+                    url: '/inbox/{{ request.user.id }}/messages/', // Adjusted URL to fetch messages for the current user
+                    success: function(response) {
+                        $('#messageList').empty();  
+                        if (response.length === 0) {
+                            $('#messageList').append('<li>No messages found.</li>');
+                        } else {
+                            response.forEach(function(message) {
+                                $('#messageList').append(
+                                    '<li>' +
+                                    '<img src="' + message.sender.profile.image.url + '" alt="' + message.sender.username + '" width="30" height="30">' +
+                                    '<a href="/profile/' + message.sender.username + '">' + message.sender.username + '</a><br>' +
+                                    message.message_content + '<br>' +
+                                    message.timestamp + 
+                                    '</li>'
+                                );
+                            });
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.error(xhr.responseText);
+                        $('#messageList').empty().append('<li>Error loading messages.</li>');
+                    }
+                });
+            });
+        });
+    </script>
+    
+    
+    <!-------------------------------MOdal Ends---------------------------->
+    <!-------------------------------------------Start Grids layout for lg-xl-3 columns and (xs-lg 1 columns)--------------------------------->
+    <div class="container">
+        <div class="row">
+            <!--------------------------left columns  start-->
+            <div class="col-12 col-lg-3">
+                <div class="left-column">
+                    <div class="card card-left1 mb-4">
+                        <img src="{% static 'img/photo-1455448972184-de647495d428.jpg' %}" alt="" class="card-img-top img-fluid">
+<div class="card-body text-center">
+    {% if request.user.profile.image %}
+        <img src="{{ request.user.profile.image.url }}" alt="img" width="120px" height="120px" class="rounded-circle mt-n5">
+    {% else %}
+        <img src="{% static 'path/to/default_image.jpg' %}" alt="img" width="120px" height="120px" class="rounded-circle mt-n5">
+    {% endif %}
+    <h5 class="card-title">{{ request.user.username }}</h5>
+    {% if request.user.profile.bio %}
+        <p class="card-text text-justify mb-2">{{ request.user.profile.bio }}</p>
+    {% else %}
+        <p class="card-text text-justify mb-2">No bio available.</p>
+    {% endif %}
+    {% if request.user.profile.pk %}
+        <h5 class="mb-3 card-title"><a href="{% url 'edit_profile' pk=request.user.profile.pk %}" class="ml-1">Edit</a></h5>
+    {% else %}
+        <h5 class="mb-3 card-title"><a href="{% url 'add_profile' %}" class="ml-1">Add</a></h5>
+    {% endif %}
+
+                        <ul class="list-unstyled nav justify-content-center">
+                            <a href="#" class="text-dark text-decoration-none">
+                                <li class="nav-item mb-3">Followers  <br> <strong>{{ request.user.followers.count }}</strong></li>
+                            </a>
+                            <a href="#" class="text-dark text-decoration-none">
+                                <li class="nav-item">Following <br> <strong>{{ request.user.following.count }}</strong></li>
+                            </a>
+                            </ul>
+                        </div>
+                    </div>
+                       
+                    <div class="card shadow-sm card-left2 mb-4">
+                        <div class="card-body">
+                            <h5 class="mb-3 card-title">About</h5>
+                            {% if index.about_data %}
+                            {% for about_instance in index.about_data %}
+                            <p class="card-text"><i class="fas fa-calendar-week mr-2"></i>{{ about_instance.went_to }}</p>
+                                    <p class="card-text"><i class="far fa-building mr-2"></i>{{ about_instance.work_at }}</p>
+                                    <p class="card-text"><i class="fas fa-home mr-2"></i>{{ about_instance.live_in }}</p>
+                                    <p class="card-text"><i class="fas fa-map-marker mr-2"></i>{{ about_instance.from_where }}</p>
+                                    <a href="{% url 'edit_about' pk=about_instance.pk %}" class="ml-1">Edit</a>
+                                {% endfor %}
+                            {% else %}
+                                <p>No about information available.</p>
+                                <a href="{% url 'aboutt' %}" class="ml-1">Add</a>
+                            {% endif %}
+                        </div>     
+                    </div>
+                    <div class="card shadow-sm card-left3 mb-4">
+
+                        <div class="card-body">
+                            <h5 class="card-title">Photos<small class="ml-2"><a href="#"></a></small></h5>
+                            <div class="row">
+                                {% for post in index.user_post %}
+                                <div class="col-6 p-1">
+                                    <a href="{{ post.image.url }}" data-lightbox="id"><img src="{{ post.image.url }}" alt="img" class="img-fluid my-2"></a>
+                                    <p><a href="{% url 'edit_post' pk=post.pk %}"><i class="far fa-edit"></i></a>
+                                    <a href="{% url 'delete_post' pk=post.pk %}" class="text-danger"><i class="far fa-trash-alt"></i></a></p>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        
+                        </div>
+                </div>
+            </div>
+ <!--------------------------Ends Left columns-->
+ <!---------------------------------------Middle columns  start---------------->          
+ <style>
+    /* Existing styles */
+    .toggle-comment-box {
+        background: none;
+        border: none;
+        color: #007bff;
+        cursor: pointer;
+        text-decoration: underline;
+    }
+
+    .comment-form-container {
+        width: 100%; /* Adjust the width as needed */
+        padding: 8px;
+        margin-bottom: 8px;
+        border: 1px solid #ddd;
+        border-radius: 3px;
+        box-sizing: border-box;
+        font-size: 14px;
+        resize: vertical; 
+    }
+    .comment-box {
+        margin-top: 10px; 
+    }
+    .comment-form input[type="text"],
+    .comment-form textarea {
+        width: 100%;
+        padding: 8px;
+        margin-bottom: 8px;
+        border: 1px solid #ddd;
+        border-radius: 3px;
+        box-sizing: border-box;
+        font-size: 14px;
+    }
+
+    .comment-form .alert-danger {
+        color: red;
+        margin-top: 5px;
+    }
+
+    .comment-form .comment-form-submit {
+        background-color: #007bff;
+        color: white;
+        padding: 10px 15px;
+        border: none;
+        border-radius: 3px;
+        cursor: pointer;
+    }
+    .like-icon.liked {
+        color: blue;
+    }
+    
+</style>
+
+<div class="col-12 col-lg-6">
+    <div class="middle-column">
+        <div class="card">
+            {% for post in index.post_data %}
+            <div class="card-body">
+                <div class="media">
+                    <img src="{{ post.userid.profile.image.url }}" alt="Profile Image" width="55px" height="55px" class="rounded-circle mr-3">
+                    <div class="media-body">
+                        <h5>{{ post.userid.username }}</h5>
+                        <small>{{ post.created_at }}</small>
+                        {% if post.caption %}
+                        <p class="card-text text-justify">{{ post.caption }}</p>
+                        {% endif %}
+                        {% if post.image %}
+                        <img src="{{ post.image.url }}" alt="Post Image" class="img-fluid mb-2">
+                        {% endif %}
+                        <br>
+                        <i class="far fa-thumbs-up mr-2 like-icon" data-post-id="{{ post.id }}"></i>
+                        <span class="like-count like-count-{{ post.id }}">{{ post.likes.count }}</span>
+                        <span style="margin-left:20px;">
+                            <a href="#" id="createcomment-{{ post.id }}" class="toggle-comment-box" data-toggle="collapse" data-target="#comment-box-{{ post.id }}">
+                                <i class="far fa-comment mr-2"></i> Comment
+                            </a>
+                            
+                        </span>
+                        <div class="collapse comment-box" id="comment-box-{{ post.id }}">
+                            <!-- Comment box content -->
+                            {% if post.comments.all %}
+                            {% for comment in post.comments.all %}
+                            <div class="media mb-3" id="comment-{{ comment.id }}">
+                                <img src="{% if comment.user.profile.image.url %}{{ comment.user.profile.image.url }}{% else %}{% static 'img/avtar.jpg' %}{% endif %}" alt="img" width="45px" height="45px" class="rounded-circle mr-2">
+                                <div class="media-body">
+                                    <div class="d-flex align-items-center">
+                                        <h6 class="mt-0 mb-1">{{ comment.user.username }}</h6>
+                                        {% if comment.user == request.user %}
+                                        <div class="d-flex ml-2">
+                                            <button class="btn btn-sm btn-primary edit-comment" data-comment-id="{{ comment.id }}">Edit</button>
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                    <p class="card-text text-justify" style="font-size: 12px;">
+                                        <span class="comment-text">{{ comment.text }}</span>
+                                    </p>
+                                    <textarea class="form-control mt-2 edit-comment-text" style="display: none;">{{ comment.text }}</textarea>
+                                    <div class="mt-2">
+                                        <button class="btn btn-sm btn-success save-edit" data-comment-id="{{ comment.id }}" style="display: none;">Save</button>
+                                        <button class="btn btn-sm btn-secondary cancel-edit" data-comment-id="{{ comment.id }}" style="display: none;">Cancel</button>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                            {% endif %}
+                            <form method="post" action="{% url 'comment' %}" class="comment-form" data-post-id="{{ post.id }}">
+                                {% csrf_token %}
+                                <input type="hidden" name="post_id" value="{{ post.id }}">
+                                {{ index.comment_form.as_p }}
+                                {% if form.errors %}
+                                <div class="alert-danger">
+                                    {% for field, error in form.errors.items %}
+                                    {{ field }}: {{ error }}
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
+                                <button type="submit" class="comment-form-submit">Post Comment</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <hr>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+<script>
+$(document).ready(function () {
+    $(".toggle-comment-box").on("click", function () {
+        var postId = $(this).attr("id").split("-")[1];
+        $("#comment-box-" + postId).toggle();
+    });
+
+    $(".like-icon").on("click", function(e) {
+        e.preventDefault();
+        var postId = $(this).data("post-id");
+        var likeCount = $(".like-count-" + postId);
+
+        $.ajax({
+            type: "POST",
+            url: "/like_post/",
+            data: {
+                post_id: postId,
+                csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val()
+            },
+            success: function(response) {
+                if (response.success) {
+                    likeCount.text(parseInt(likeCount.text()) + 1);
+                    $(".like-icon[data-post-id=" + postId + "]").addClass("liked");
+                } else {
+                    alert(response.error);
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error(xhr.responseText);
+                alert("An error occurred while processing the request.");
+            }
+        });
+    });
+
+    $(".edit-comment").on("click", function () {
+        var commentId = $(this).data("comment-id");
+        var commentText = $("#comment-" + commentId + " .comment-text");
+        var editCommentText = $("#comment-" + commentId + " .edit-comment-text");
+        var saveButton = $("#comment-" + commentId + " .save-edit");
+        var cancelButton = $("#comment-" + commentId + " .cancel-edit");
+
+        commentText.hide();
+        editCommentText.show();
+        saveButton.show();
+        cancelButton.show();
+        $(this).hide();
+    });
+
+    $(".cancel-edit").on("click", function () {
+        var commentId = $(this).data("comment-id");
+        var commentText = $("#comment-" + commentId + " .comment-text");
+        var editCommentText = $("#comment-" + commentId + " .edit-comment-text");
+        var saveButton = $("#comment-" + commentId + " .save-edit");
+        var editButton = $("#comment-" + commentId + " .edit-comment");
+
+        commentText.show();
+        editCommentText.hide();
+        saveButton.hide();
+        $(this).hide();
+        editButton.show();
+    });
+
+    $(".save-edit").on("click", function () {
+        var commentId = $(this).data("comment-id");
+        var editCommentText = $("#comment-" + commentId + " .edit-comment-text").val();
+
+        $.ajax({
+            type: "POST",
+            url: "/edit_comment/",
+            data: {
+                comment_id: commentId,
+                text: editCommentText,
+                csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val()
+            },
+            success: function(response) {
+                if (response.success) {
+                    $("#comment-" + commentId + " .comment-text").text(response.comment_text);
+                    $("#comment-" + commentId + " .edit-comment-text").hide();
+                    $("#comment-" + commentId + " .save-edit").hide();
+                    $("#comment-" + commentId + " .cancel-edit").hide();
+                    $("#comment-" + commentId + " .comment-text").show();
+                    $("#comment-" + commentId + " .edit-comment").show();
+                } else {
+                    alert(response.error);
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error(xhr.responseText);
+                alert("An error occurred while processing the request.");
+            }
+        });
+    });
+
+    $(".comment-form").on("submit", function (e) {
+        e.preventDefault();
+
+        var postId = $(this).data("post-id");
+        var formData = $(this).serialize();
+
+        $.ajax({
+            type: "POST",
+            url: $(this).attr("action"),
+            data: formData,
+            success: function (response) {
+                if (response.success) {
+                    var commentBox = $("#comment-box-" + postId);
+                    commentBox.prepend(response.comment_html);
+                    $(".comment-form")[0].reset();
+
+                    // Redirect to the index page after successful comment submission
+                    window.location.href = "/"; // Adjust the URL to your index page if needed
+                } else {
+                    alert(response.error);
+                    console.error("Server error response:", response);
+                }
+            },
+            error: function (xhr, status, error) {
+                console.error(xhr.responseText);
+                alert("An error occurred while processing the request.");
+            }
+        });
+    });
+
+    document.addEventListener("DOMContentLoaded", function () {
+        const createCommentLinks = document.querySelectorAll('.toggle-comment-box');
+        createCommentLinks.forEach(link => {
+            link.addEventListener('click', function (event) {
+                event.preventDefault(); 
+                const postId = this.id.split('-')[1];
+                const commentBox = document.getElementById(`comment-box-${postId}`);
+                if (commentBox) {
+                    commentBox.classList.toggle('hidden');
+                }
+            });
+        });
+    });
+
+    function toggleFriendsView() {
+        var limitedView = document.getElementById('limitedView');
+        var allView = document.getElementById('allView');
+        var viewAllLink = document.getElementById('viewAllLink');
+
+        if (limitedView.style.display === 'none') {
+            limitedView.style.display = 'flex';
+            allView.style.display = 'none';
+            viewAllLink.innerHTML = '<small>View All</small>';
+        } else {
+            limitedView.style.display = 'none';
+            allView.style.display = 'flex';
+            viewAllLink.innerHTML = '<small>View Less</small>';
+        }
+    }
+});
+
+</script>
+
+<hr>
+
+
+<!------------------------Middle column Ends---------------->
+<!---------------------------Statrs Right Columns----------------->              
+<div class="col-12 col-lg-3">
+    <div class="right-column">
+        <div class="card shadow-sm mb-4">
+            <div class="card-body">
+                <h6 class="card-title">Suggested for You<a href="#" class="ml-1"></a></h6>
+                <div class="row no-gutters d-none d-lg-flex">
+                    {% for user in index.suggested_users %}
+                        {% if user != request.user and not user.is_superuser %}
+                        <div id="user-container-{{ user.id }}" class="col-6 p-1">                                
+                            {% if user.profile.image %}
+    <img src="{{ user.profile.image.url }}" alt="Profile Picture" class="rounded-circle mb-4" width="80px" height="80px">
+{% else %}
+    <img src="path/to/default/image.jpg" alt="Default Profile Picture" class="rounded-circle mb-4" width="80px" height="80px">
+{% endif %}
+                        </div>
+                        <div class="col-6 p-1 text-left">
+                            <h6>{{ user.username }}</h6>
+                            <form id="follow-form" action="{% url 'follow_user' user.id %}" method="post">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-outline-info btn-sm mb-3"><i class="fas fa-user-friends"></i>Follow</button>
+                            </form>
+                        </div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+                
+            </div>
+        </div>
+    </div>
+    </div>
+</div>
+</div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.slim.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/js/bootstrap.min.js"></script>
+</body>
+</html>
+
+{% endblock %}

@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inbox</title>
+</head>
+<body>
+    <h1>Inbox</h1>
+    <ul>
+        {% for message in messages %}
+            <li>
+                <strong>From:</strong> {{ message.sender.username }}<br>
+                <strong>Message:</strong> {{ message.message_content }}<br>
+                <strong>Timestamp:</strong> {{ message.timestamp }}
+            </li>
+        {% empty %}
+            <li>No messages found.</li>
+        {% endfor %}
+    </ul>
+</body>
+</html>
