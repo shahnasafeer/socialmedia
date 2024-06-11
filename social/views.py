@@ -263,7 +263,13 @@ class CommentView(View):
             comment = get_object_or_404(Comment, id=comment_id)
             comment.text = comment_text
             comment.save()
-            return JsonResponse({'success': True, 'comment_text': comment.text})
+            return JsonResponse({
+                'success': True,
+                'comment_id': comment.id,
+                'comment_text': comment.text,
+                'commenter_username': comment.user.username,
+                'commenter_image_url': comment.user.profile.image.url if comment.user.profile.image else '/static/img/default_avatar.jpg'
+            })
         else:
             # Creating a new comment
             form = CommentForm(request.POST)
@@ -273,13 +279,18 @@ class CommentView(View):
                     comment.post = Post.objects.get(id=post_id)
                 except Post.DoesNotExist:
                     return JsonResponse({'success': False, 'error': 'Invalid post ID.'})
+                comment.user = request.user
                 comment.save()
-                return JsonResponse({'success': True, 'comment_text': comment.text})
+                return JsonResponse({
+                    'success': True,
+                    'comment_id': comment.id,
+                    'comment_text': comment.text,
+                    'commenter_username': comment.user.username,
+                    'commenter_image_url': comment.user.profile.image.url if comment.user.profile.image else '/static/img/default_avatar.jpg'
+                })
             else:
                 logger.error(f'Form errors: {form.errors}')
                 return JsonResponse({'success': False, 'error': 'Error submitting comment.'})
-
-        return JsonResponse({'success': False, 'error': 'Unexpected error.'})
 class SearchUsersView(View):
     def get(self, request):
         if request.headers.get('X-Requested-With') == 'XMLHttpRequest':

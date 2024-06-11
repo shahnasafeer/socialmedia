@@ -152,58 +152,57 @@
  <!--------------------------Ends Left columns-->
  <!---------------------------------------Middle columns  start---------------->          
  <style>
-    /* Existing styles */
-    .toggle-comment-box {
-        background: none;
-        border: none;
-        color: #007bff;
-        cursor: pointer;
-        text-decoration: underline;
-    }
+.toggle-comment-box {
+    background: none;
+    border: none;
+    color: #007bff;
+    cursor: pointer;
+    text-decoration: underline;
+}
 
-    .comment-form-container {
-        width: 100%; /* Adjust the width as needed */
-        padding: 8px;
-        margin-bottom: 8px;
-        border: 1px solid #ddd;
-        border-radius: 3px;
-        box-sizing: border-box;
-        font-size: 14px;
-        resize: vertical; 
-    }
-    .comment-box {
-        margin-top: 10px; 
-    }
-    .comment-form input[type="text"],
-    .comment-form textarea {
-        width: 100%;
-        padding: 8px;
-        margin-bottom: 8px;
-        border: 1px solid #ddd;
-        border-radius: 3px;
-        box-sizing: border-box;
-        font-size: 14px;
-    }
+.comment-form-container {
+    width: 100%; /* Adjust the width as needed */
+    padding: 8px;
+    margin-bottom: 8px;
+    border: 1px solid #ddd;
+    border-radius: 3px;
+    box-sizing: border-box;
+    font-size: 14px;
+    resize: vertical; 
+}
+.comment-box {
+    margin-top: 10px; 
+}
+.comment-form input[type="text"],
+.comment-form textarea {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 8px;
+    border: 1px solid #ddd;
+    border-radius: 3px;
+    box-sizing: border-box;
+    font-size: 14px;
+}
 
-    .comment-form .alert-danger {
-        color: red;
-        margin-top: 5px;
-    }
+.comment-form .alert-danger {
+    color: red;
+    margin-top: 5px;
+}
 
-    .comment-form .comment-form-submit {
-        background-color: #007bff;
-        color: white;
-        padding: 10px 15px;
-        border: none;
-        border-radius: 3px;
-        cursor: pointer;
-    }
-    .like-icon.liked {
-        color: blue;
-    }
+.comment-form .comment-form-submit {
+    background-color: #007bff;
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+}
+
+.like-icon.liked {
+    color: blue;
+}
     
 </style>
-
 <div class="col-12 col-lg-6">
     <div class="middle-column">
         <div class="card">
@@ -227,35 +226,36 @@
                             <a href="#" id="createcomment-{{ post.id }}" class="toggle-comment-box" data-toggle="collapse" data-target="#comment-box-{{ post.id }}">
                                 <i class="far fa-comment mr-2"></i> Comment
                             </a>
-                            
                         </span>
                         <div class="collapse comment-box" id="comment-box-{{ post.id }}">
                             <!-- Comment box content -->
-                            {% if post.comments.all %}
-                            {% for comment in post.comments.all %}
-                            <div class="media mb-3" id="comment-{{ comment.id }}">
-                                <img src="{% if comment.user.profile.image.url %}{{ comment.user.profile.image.url }}{% else %}{% static 'img/avtar.jpg' %}{% endif %}" alt="img" width="45px" height="45px" class="rounded-circle mr-2">
-                                <div class="media-body">
-                                    <div class="d-flex align-items-center">
-                                        <h6 class="mt-0 mb-1">{{ comment.user.username }}</h6>
-                                        {% if comment.user == request.user %}
-                                        <div class="d-flex ml-2">
-                                            <button class="btn btn-sm btn-primary edit-comment" data-comment-id="{{ comment.id }}">Edit</button>
+                            <div class="media-list">
+                                {% if post.comments.all %}
+                                {% for comment in post.comments.all %}
+                                <div class="media mb-3" id="comment-{{ comment.id }}">
+                                    <img src="{% if comment.user.profile.image.url %}{{ comment.user.profile.image.url }}{% else %}{% static 'img/avatar.jpg' %}{% endif %}" alt="img" width="45px" height="45px" class="rounded-circle mr-2">
+                                    <div class="media-body">
+                                        <div class="d-flex align-items-center">
+                                            <h6 class="mt-0 mb-1">{{ comment.user.username }}</h6>
+                                            {% if comment.user == request.user %}
+                                            <div class="d-flex ml-2">
+                                                <button class="btn btn-sm btn-primary edit-comment" data-comment-id="{{ comment.id }}">Edit</button>
+                                            </div>
+                                            {% endif %}
                                         </div>
-                                        {% endif %}
-                                    </div>
-                                    <p class="card-text text-justify" style="font-size: 12px;">
-                                        <span class="comment-text">{{ comment.text }}</span>
-                                    </p>
-                                    <textarea class="form-control mt-2 edit-comment-text" style="display: none;">{{ comment.text }}</textarea>
-                                    <div class="mt-2">
-                                        <button class="btn btn-sm btn-success save-edit" data-comment-id="{{ comment.id }}" style="display: none;">Save</button>
-                                        <button class="btn btn-sm btn-secondary cancel-edit" data-comment-id="{{ comment.id }}" style="display: none;">Cancel</button>
+                                        <p class="card-text text-justify" style="font-size: 12px;">
+                                            <span class="comment-text">{{ comment.text }}</span>
+                                        </p>
+                                        <textarea class="form-control mt-2 edit-comment-text" style="display: none;">{{ comment.text }}</textarea>
+                                        <div class="mt-2">
+                                            <button class="btn btn-sm btn-success save-edit" data-comment-id="{{ comment.id }}" style="display: none;">Save</button>
+                                            <button class="btn btn-sm btn-secondary cancel-edit" data-comment-id="{{ comment.id }}" style="display: none;">Cancel</button>
+                                        </div>
                                     </div>
                                 </div>
+                                {% endfor %}
+                                {% endif %}
                             </div>
-                            {% endfor %}
-                            {% endif %}
                             <form method="post" action="{% url 'comment' %}" class="comment-form" data-post-id="{{ post.id }}">
                                 {% csrf_token %}
                                 <input type="hidden" name="post_id" value="{{ post.id }}">
@@ -281,11 +281,113 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
 <script>
 $(document).ready(function () {
+    // Toggle comment box
     $(".toggle-comment-box").on("click", function () {
         var postId = $(this).attr("id").split("-")[1];
         $("#comment-box-" + postId).toggle();
     });
 
+    // Handle comment form submission
+    $(".comment-form").on("submit", function (e) {
+        e.preventDefault();
+
+        var form = $(this);
+        var postId = form.data("post-id");
+        var formData = form.serialize();
+
+        $.ajax({
+            type: "POST",
+            url: form.attr("action"),
+            data: formData,
+            success: function (response) {
+                if (response.success) {
+                    var commentBox = $("#comment-box-" + postId + " .media-list");
+                    var newComment = `
+                        <div class="media mb-3" id="comment-${response.comment_id}">
+                            <img src="${response.commenter_image_url}" alt="img" width="45px" height="45px" class="rounded-circle mr-2">
+                            <div class="media-body">
+                                <div class="d-flex align-items-center">
+                                    <h6 class="mt-0 mb-1">${response.commenter_username}</h6>
+                                    <div class="d-flex ml-2">
+                                        <button class="btn btn-sm btn-primary edit-comment" data-comment-id="${response.comment_id}">Edit</button>
+                                    </div>
+                                </div>
+                                <p class="card-text text-justify" style="font-size: 12px;">
+                                    <span class="comment-text">${response.comment_text}</span>
+                                </p>
+                                <textarea class="form-control mt-2 edit-comment-text" style="display: none;">${response.comment_text}</textarea>
+                                <div class="mt-2">
+                                    <button class="btn btn-sm btn-success save-edit" data-comment-id="${response.comment_id}" style="display: none;">Save</button>
+                                    <button class="btn btn-sm btn-secondary cancel-edit" data-comment-id="${response.comment_id}" style="display: none;">Cancel</button>
+                                </div>
+                            </div>
+                        </div>`;
+
+                    commentBox.prepend(newComment);
+                    form[0].reset();
+                } else {
+                    alert(response.error);
+                }
+            },
+            error: function (xhr, status, error) {
+                console.error(xhr.responseText);
+                alert("An error occurred while processing the request.");
+            }
+        });
+    });
+
+    // Edit comment
+    $(document).on("click", ".edit-comment", function () {
+        var commentId = $(this).data("comment-id");
+        var comment = $("#comment-" + commentId);
+        comment.find(".comment-text").hide();
+        comment.find(".edit-comment-text").show();
+        comment.find(".save-edit, .cancel-edit").show();
+        comment.find(".edit-comment").hide();
+    });
+
+    // Cancel edit comment
+    $(document).on("click", ".cancel-edit", function () {
+        var commentId = $(this).data("comment-id");
+        var comment = $("#comment-" + commentId);
+        comment.find(".comment-text").show();
+        comment.find(".edit-comment-text").hide();
+        comment.find(".save-edit, .cancel-edit").hide();
+        comment.find(".edit-comment").show();
+    });
+
+    // Save edited comment
+    $(document).on("click", ".save-edit", function () {
+        var commentId = $(this).data("comment-id");
+        var comment = $("#comment-" + commentId);
+        var commentText = comment.find(".edit-comment-text").val();
+
+        $.ajax({
+            type: "POST",
+            url: "/edit_comment/",
+            data: {
+                comment_id: commentId,
+                text: commentText,
+                csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val()
+            },
+            success: function (response) {
+                if (response.success) {
+                    comment.find(".comment-text").text(response.comment_text).show();
+                    comment.find(".edit-comment-text").hide();
+                    comment.find(".save-edit, .cancel-edit").hide();
+                    comment.find(".edit-comment").show();
+                } else {
+                    alert(response.error);
+                }
+            },
+            error: function (xhr, status, error) {
+                console.error(xhr.responseText);
+                alert("An error occurred while processing the request.");
+            }
+        });
+    });
+
+    // Like functionality
     $(".like-icon").on("click", function(e) {
         e.preventDefault();
         var postId = $(this).data("post-id");
@@ -313,95 +415,6 @@ $(document).ready(function () {
         });
     });
 
-    $(".edit-comment").on("click", function () {
-        var commentId = $(this).data("comment-id");
-        var commentText = $("#comment-" + commentId + " .comment-text");
-        var editCommentText = $("#comment-" + commentId + " .edit-comment-text");
-        var saveButton = $("#comment-" + commentId + " .save-edit");
-        var cancelButton = $("#comment-" + commentId + " .cancel-edit");
-
-        commentText.hide();
-        editCommentText.show();
-        saveButton.show();
-        cancelButton.show();
-        $(this).hide();
-    });
-
-    $(".cancel-edit").on("click", function () {
-        var commentId = $(this).data("comment-id");
-        var commentText = $("#comment-" + commentId + " .comment-text");
-        var editCommentText = $("#comment-" + commentId + " .edit-comment-text");
-        var saveButton = $("#comment-" + commentId + " .save-edit");
-        var editButton = $("#comment-" + commentId + " .edit-comment");
-
-        commentText.show();
-        editCommentText.hide();
-        saveButton.hide();
-        $(this).hide();
-        editButton.show();
-    });
-
-    $(".save-edit").on("click", function () {
-        var commentId = $(this).data("comment-id");
-        var editCommentText = $("#comment-" + commentId + " .edit-comment-text").val();
-
-        $.ajax({
-            type: "POST",
-            url: "/edit_comment/",
-            data: {
-                comment_id: commentId,
-                text: editCommentText,
-                csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val()
-            },
-            success: function(response) {
-                if (response.success) {
-                    $("#comment-" + commentId + " .comment-text").text(response.comment_text);
-                    $("#comment-" + commentId + " .edit-comment-text").hide();
-                    $("#comment-" + commentId + " .save-edit").hide();
-                    $("#comment-" + commentId + " .cancel-edit").hide();
-                    $("#comment-" + commentId + " .comment-text").show();
-                    $("#comment-" + commentId + " .edit-comment").show();
-                } else {
-                    alert(response.error);
-                }
-            },
-            error: function(xhr, status, error) {
-                console.error(xhr.responseText);
-                alert("An error occurred while processing the request.");
-            }
-        });
-    });
-
-    $(".comment-form").on("submit", function (e) {
-        e.preventDefault();
-
-        var postId = $(this).data("post-id");
-        var formData = $(this).serialize();
-
-        $.ajax({
-            type: "POST",
-            url: $(this).attr("action"),
-            data: formData,
-            success: function (response) {
-                if (response.success) {
-                    var commentBox = $("#comment-box-" + postId);
-                    commentBox.prepend(response.comment_html);
-                    $(".comment-form")[0].reset();
-
-                    // Redirect to the index page after successful comment submission
-                    window.location.href = "/"; // Adjust the URL to your index page if needed
-                } else {
-                    alert(response.error);
-                    console.error("Server error response:", response);
-                }
-            },
-            error: function (xhr, status, error) {
-                console.error(xhr.responseText);
-                alert("An error occurred while processing the request.");
-            }
-        });
-    });
-
     document.addEventListener("DOMContentLoaded", function () {
         const createCommentLinks = document.querySelectorAll('.toggle-comment-box');
         createCommentLinks.forEach(link => {
@@ -415,28 +428,25 @@ $(document).ready(function () {
             });
         });
     });
-
-    function toggleFriendsView() {
-        var limitedView = document.getElementById('limitedView');
-        var allView = document.getElementById('allView');
-        var viewAllLink = document.getElementById('viewAllLink');
-
-        if (limitedView.style.display === 'none') {
-            limitedView.style.display = 'flex';
-            allView.style.display = 'none';
-            viewAllLink.innerHTML = '<small>View All</small>';
-        } else {
-            limitedView.style.display = 'none';
-            allView.style.display = 'flex';
-            viewAllLink.innerHTML = '<small>View Less</small>';
-        }
-    }
 });
-
+    function toggleFriendsView() {
+                                 
+                                 var limitedView = document.getElementById('limitedView');
+                                 var allView = document.getElementById('allView');
+                                 var viewAllLink = document.getElementById('viewAllLink');
+                         
+                                 if (limitedView.style.display === 'none') {
+                                     limitedView.style.display = 'flex';
+                                     allView.style.display = 'none';
+                                     viewAllLink.innerHTML = '<small>View All</small>';
+                                 } else {
+                                     limitedView.style.display = 'none';
+                                     allView.style.display = 'flex';
+                                     viewAllLink.innerHTML = '<small>View Less</small>';
+                                 }
+                             }
 </script>
-
 <hr>
-
 
 <!------------------------Middle column Ends---------------->
 <!---------------------------Statrs Right Columns----------------->              
