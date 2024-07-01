@@ -1,82 +1,53 @@
 {% extends 'layout/base.html' %}
 {% load static %}
 {% block content %}
-<style>
-/* Additional CSS styles */
-#appointment {
-    padding: 200px 0; /* Adjusted padding for full-screen display */
-    background: linear-gradient(135deg, #2f91d2, #cad1d7); /* Gradient background */
-}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Sign Up Form by Colorlib</title>
+    <link rel="stylesheet" href="{% static 'fonts/material-icon/css/material-design-iconic-font.min.css' %}">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
 
-#appointment-form {
-    background-color: #fff;
-    padding: 30px;
-    border-radius: 10px;
-    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
-    text-align: center; /* Center-align the text inside the form */
-}
+    <div class="main">
 
-/* Center-align the form elements */
-#appointment-form .form-group {
-    margin: 10 auto; /* Horizontally center the form elements */
-    max-width: 300px; /* Optional: Set max-width for better readability */
-}
-
-
-.form-group {
-    margin-bottom: 20px; /* Reduced margin between form groups */
-}
-
-#cf-submit {
-    background-color: #007bff; /* Blue button color */
-    color: #fff;
-    border: none;
-    padding: 10px 20px; /* Decreased button padding */
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-    margin-top: 10px; /* Added margin to the top */
-}
-
-#cf-submit:hover {
-    background-color: #0056b3; /* Darker blue color on hover */
-}
-
-h2 {
-    text-align: center;
-    color: #007bff; /* Blue color for heading */
-    margin-bottom: 40px; /* Increased margin bottom for separation */
-}
-
-</style>
-<section id="appointment" data-stellar-background-ratio="3">
-    <div class="container">
-         <div class="row justify-content-center"> <!-- Center the login form -->
-              <div class="col-md-6 col-sm-6">
-                   <!-- CONTACT FORM HERE -->
-                   <form id="appointment-form" role="form" method="post" action="{% url 'signin' %}">
-
-                        <!-- SECTION TITLE -->
-                        <div class="section-title wow fadeInUp" data-wow-delay="0.4s">
-                             <h2>LOGIN</h2>
-                        </div>
-
-                        <div class="wow fadeInUp" data-wow-delay="0.8s">
-                             <div class="col-md-6 col-sm-6">
-                                {% csrf_token %}
-                                    <div class="form-group">
-                                        {{ form.as_p }}
-                                    </div>
-                                {% if form.errors %}<div class="alert-danger">{{form.errors}}</div>{% endif %}
+        <!-- Sign up form -->
+        <section class="signup">
+            <div class="container">
+                <div class="signup-content">
+                    <div class="signup-form">
+                        <h2 class="form-title">SIGN IN</h2>
+                        <form method="post" action="{% url 'signin' %}" class="register-form" id="register-form">
+                            {% csrf_token %}
+                            <div class="form-group">
+                                {{ form.as_p }}
+                            </div>
+                            {% if form.errors %}
+                            <div class="alert-danger">{{ form.errors }}</div>
+                            {% endif %}
+                            <div class="form-group form-button">
                                 <button type="submit" class="form-control" id="cf-submit" name="submit">Login</button>
-                                <p>Not Registered Yet? <a href="{% url 'signup' %}">Sign Up</a></p>
-                                <p><a href="{% url 'forgot_password' %}">Forgot Password?</a></p> <!-- Fixed the HTML tag mismatch -->
-                             </div>
-                        </div>
-                  </form>
-              </div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="signup-image">
+                        <figure><img src="{% static 'images/signup-image.jpg' %}" alt="sign up image"></figure>
+                        <a href="{% url 'signup' %}" class="signup-image-link">Not Registerd Yet?</a>
+                    </div>
+                </div>
+            </div>
+        </section>
 
-         </div>
     </div>
-</section>
+
+    <!-- JS -->
+    <script src="{% static 'vendor/jquery/jquery.min.js' %}"></script>
+    <script src="{% static 'js/main.js' %}"></script>
+
+</body>
+</html>
 {% endblock %}

@@ -39,7 +39,7 @@ class PostForm(forms.ModelForm):
         model = Post
         fields = ['caption', 'image']
         widgets = {
-            'caption': forms.Textarea(attrs={'class':'form-group'}),  
+            'caption': forms.Textarea(attrs={'class':'form-group','id': 'content', 'rows': 4, 'placeholder': 'Type your caption here...'}),  
             'image': forms.FileInput(),  
         }
 class CommentForm(forms.ModelForm):

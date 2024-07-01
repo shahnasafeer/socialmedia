@@ -1,76 +1,52 @@
 {% extends 'layout/base.html' %}
 {% load static %}
 {% block content %}
-<style>
-   #appointment {
-    padding: 156px 0; /* Adjusted padding for full-screen display */
-    background: linear-gradient(135deg, #2f91d2, #cad1d7); /* Gradient background */
-}
-    #appointment-form {
-        background-color: #fff;
-        padding: 30px;
-        border-radius: 10px;
-        box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
-    }
-    .form-group {
-        margin-bottom: 20px;
-    }
-    #cf-submit {
-    background-color: #007bff; 
-    color: #fff;
-    border: none;
-    padding: 6px 16px; /* Decreased button padding */
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-    font-size: 14px; 
-    display: block; /* Change button to block element */
-    margin: 0 auto; /* Center-align the button */
-}
-    #cf-submit:hover {
-        background-color: #0056b3; 
-    }
-    .section-title {
-        text-align: center;
-    }
-    h2 {
-    text-align: center;
-    color: #007bff; /* Blue color for heading */
-    margin-bottom: 40px; /* Increased margin bottom for separation */
-}
-    
-</style>
-<section id="appointment" data-stellar-background-ratio="3">
-    <div class="container">
-         <div class="row justify-content-center">
-              <div class="col-md-10 col-sm-10">
-                   <!-- CONTACT FORM HERE -->
-                   <form id="appointment-form" role="form" method="post" action="{% url 'signup' %}">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Sign Up Form by Colorlib</title>
+    <link rel="stylesheet" href="{% static 'fonts/material-icon/css/material-design-iconic-font.min.css' %}">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
 
-                    <!-- SECTION TITLE -->
-                    <div class="section-title wow fadeInUp" data-wow-delay="0.4s">
-                         <h2>Sign Up</h2>
-                    </div>
+    <div class="main">
 
-                    <div class="wow fadeInUp" data-wow-delay="0.8s">
-                         <div class="col-md-12 col-sm-12">
+        <!-- Sign up form -->
+        <section class="signup">
+            <div class="container">
+                <div class="signup-content">
+                    <div class="signup-form">
+                        <h2 class="form-title">Sign up</h2>
+                        <form method="post" action="{% url 'signup' %}" class="register-form" id="register-form">
                             {% csrf_token %}
                             <div class="form-group">
                                 {{ form.as_p }}
                             </div>
-                            {% if msg %}
-                                <div class="alert alert-success">{{ msg }}</div>
+                            {% if form.errors %}
+                            <div class="alert-danger">{{ form.errors }}</div>
                             {% endif %}
-                            {% if error %}
-                                <div class="alert alert-danger">{{ error }}</div>
-                            {% endif %}
-                            <button type="submit" class="form-control" id="cf-submit" name="submit">Sign Up</button>
-                         </div>
+                            <div class="form-group form-button">
+                                <button type="submit" class="form-control" id="cf-submit" name="submit">Sign Up</button>
+                            </div>
+                        </form>
                     </div>
-              </form>
-              </div>
+                    <div class="signup-image">
+                        <figure><img src="{% static 'images/signup-image.jpg' %}" alt="sign up image"></figure>
+                    </div>
+                </div>
+            </div>
+        </section>
 
-         </div>
     </div>
-</section>
+
+    <!-- JS -->
+    <script src="{% static 'vendor/jquery/jquery.min.js' %}"></script>
+    <script src="{% static 'js/main.js' %}"></script>
+
+</body>
+</html>
 {% endblock %}

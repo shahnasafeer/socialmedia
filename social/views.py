@@ -84,7 +84,7 @@ class SignOutView(View):
 class LoginView(View):
     def get(self, request):
         form = AuthenticationForm()
-        return render(request, 'sign.html', {'form': form})
+        return render(request, 'signin.html', {'form': form})
 
     def post(self, request):
         form = AuthenticationForm(request, data=request.POST)
@@ -102,29 +102,40 @@ class LoginView(View):
         else:
             messages.error(request, 'Invalid form submission. Please check the form data.')
 
-        return render(request, 'sign.html', {'form': form})
+        return render(request, 'signin.html', {'form': form})
 class AboutView(LoginRequiredMixin, View):
     def get(self, request, pk=None):
-        if pk is not None:
-            instance = About.objects.get(pk=pk)
-            if instance.userid_id == request.user.id:
-                form = AboutForm(instance=instance)
-                return render(request, 'Aboutt.html', {'form': form, 'instance': instance})
-            else:
-                return redirect('index')  
+        context = {}
+
+        if pk:
+            instance = get_object_or_404(About, pk=pk)
+            if instance.userid_id != request.user.id:
+                return redirect('index')
+            form = AboutForm(instance=instance)
+            context['form'] = form
+            context['instance'] = instance
         else:
             form = AboutForm()
-            data = About.objects.filter(userid=request.user)  
-            return render(request, 'Aboutt.html', {'form': form, 'data': data})
-   
+            data = About.objects.filter(userid=request.user)
+            context['form'] = form
+            context['data'] = data
+
+        about_data = About.objects.filter(userid=request.user)
+        user_post = Post.objects.filter(userid=request.user)
+        suggested_users = User.objects.exclude(pk=request.user.pk)
+        context['suggested_users'] = suggested_users
+        context['user_post'] = user_post
+        context['about_data'] = about_data
+
+        return render(request, 'Aboutt.html', context)
+
     def post(self, request, pk=None):
         instance_id = request.POST.get('instance')
         if instance_id:
-            instance = About.objects.get(pk=instance_id)
-            if instance.userid_id == request.user.id:
-                form = AboutForm(request.POST, request.FILES, instance=instance)
-            else:
-                return redirect('index')  
+            instance = get_object_or_404(About, pk=instance_id)
+            if instance.userid_id != request.user.id:
+                return redirect('index')
+            form = AboutForm(request.POST, request.FILES, instance=instance)
         else:
             form = AboutForm(request.POST, request.FILES)
 
@@ -134,8 +145,11 @@ class AboutView(LoginRequiredMixin, View):
             about_instance.save()
             return redirect('index')
         else:
-            data = About.objects.filter(userid=request.user) 
-            return render(request, 'Aboutt.html', {'form': form, 'data': data})
+            if pk:
+                data = About.objects.filter(userid=request.user)
+                return render(request, 'Aboutt.html', {'form': form, 'data': data, 'pk': pk})
+            else:
+                return render(request, 'Aboutt.html', {'form': form})
 
 class EditAboutView(View):
     def get(self, request, pk):
@@ -248,9 +262,8 @@ class LikePostView(View):
                 return JsonResponse({'success': False, 'error': 'User has already liked this post'})
         else:
             return JsonResponse({'success': False, 'error': 'User not authenticated'})
-################################################################
+        
 logger = logging.getLogger(__name__)
-
 class CommentView(View):
     def post(self, request):
         logger.debug(f'Request POST data: {request.POST}')
@@ -271,7 +284,6 @@ class CommentView(View):
                 'commenter_image_url': comment.user.profile.image.url if comment.user.profile.image else '/static/img/default_avatar.jpg'
             })
         else:
-            # Creating a new comment
             form = CommentForm(request.POST)
             if form.is_valid():
                 comment = form.save(commit=False)
@@ -300,6 +312,7 @@ class SearchUsersView(View):
                 data = [{'username': profile.username} for profile in results]
                 return JsonResponse(data, safe=False)
         return JsonResponse([], safe=False)
+################################################################
 
 class UsersListView(LoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
