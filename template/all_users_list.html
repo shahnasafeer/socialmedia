@@ -2,60 +2,173 @@
 {% load static %}
 
 {% block content %}
-<div class="col-12 col-lg-3">
-    <div class="right-column">
-        <div class="card shadow-sm mb-4">
-            <div class="card-body">
-                <h6 class="card-title">Suggested for You<a href="#" class="ml-1"></a></h6>
-                <div class="row no-gutters d-none d-lg-flex">
-                    {% for user in users %}
-                        {% if not user.is_superuser %}
-                            <div id="user-container-{{ user.id }}" class="col-6 p-1">                                
-                                <a href="#">
-                                    <img src="{{ user.profile.image.url }}" alt="Profile Picture" class="rounded-circle mb-4" width="80px" height="80px">
-                                </a>
-                            </div>
-                            <div class="col-6 p-1 text-left">
-                                <a href="{% url 'profile' user.username %}">
-                                    <h6>{{ user.username }}</h6>
-                                </a>
-                                <button type="button" class="btn btn-outline-info btn-sm mb-3 message-button" data-user="{{ user.id }}">
-                                    <i class="fas fa-envelope mr-1"></i> 
-                                    Message
-                                </button>
-                                <div id="message-form-{{ user.id }}" class="message-form" style="display: none;">
-                                    <form action="{% url 'send_message' user.id %}" method="post">
-                                        {% csrf_token %}
-                                        {{ form.as_p }}
-                                        <button type="submit" class="btn btn-primary">Send Message</button>
-                                    </form>
+<div class="container">
+    <div class="row">
+        <!-- Right Column -->
+        <div class="col-12 col-lg-3">
+            <div class="right-column">
+                <div class="card shadow-sm mb-4">
+                    <div class="card-body">
+                        <h6 class="card-title"><a href="#" class="ml-1"></a></h6>
+                        <div class="row no-gutters d-none d-lg-flex">
+                            {% for user in users %}
+                                {% if not user.is_superuser %}
+                                    <div id="user-container-{{ user.id }}" class="col-6 p-1">
+                                        <a href="#">
+                                            <img src="{{ user.profile.image.url }}" alt="Profile Picture" class="rounded-circle mb-4" width="80px" height="80px">
+                                        </a>
+                                    </div>
+                                    <div class="col-6 p-1 text-left">
+                                        <a href="{% url 'profile' user.username %}">
+                                            <h6>{{ user.username }}</h6>
+                                        </a>
+                                        <button type="button" class="btn btn-outline-info btn-sm mb-3 message-button" data-user="{{ user.id }}">
+                                            <i class="fas fa-envelope mr-1"></i>Message</button>
+                                    </div>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Middle Column -->
+        <div class="col-12 col-lg-9">
+            <div class="middle-column">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="media">
+                            <div class="media-body">
+                                <!-- Messenger -->
+                                <div id="messages" style="height: 300px; overflow-y: scroll;">
+                                    <!-- Messages will appear here -->
+                                    
+                                    {% for message in send_messages %}
+                                        <div class="message">
+                                            <strong>To:</strong> {{ message.recipient.username }}<br>
+                                            {{ message.text }}<br>
+                                            <small>{{ message.timestamp }}</small>
+                                        </div>
+                                        <hr>
+                                    {% endfor %}
+
+                                    
+                                    {% for message in receive_messages %}
+                                        <div class="message">
+                                            <strong>From:</strong> {{ message.sender.username }}<br>
+                                            {{ message.text }}<br>
+                                            <small>{{ message.timestamp }}</small>
+                                        </div>
+                                        <hr>
+                                    {% endfor %}
                                 </div>
+                                <form id="message-form">
+                                    <div class="input-group mt-3">
+                                        <input type="text" class="form-control" id="message-input" placeholder="Type your message...">
+                                        <div class="input-group-append">
+                                            <button type="submit" class="btn btn-outline-primary" id="send-message-btn">Send Message</button>
+                                        </div>
+                                    </div>
+                                </form>
                             </div>
-                        {% endif %}
-                    {% endfor %}
+                        </div>
+                    </div>
+                    <hr>
                 </div>
             </div>
         </div>
     </div>
 </div>
-</div>
-</div>
 
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const messageButtons = document.querySelectorAll('.message-button');
-        messageButtons.forEach(function(button) {
-            button.addEventListener('click', function() {
-                const userId = this.getAttribute('data-user');
-                const messageForm = document.getElementById('message-form-' + userId);
-                if (messageForm.style.display === 'none' || messageForm.style.display === '') {
-                    messageForm.style.display = 'block';
-                } else {
-                    messageForm.style.display = 'none';
-                }
-            });
+document.addEventListener('DOMContentLoaded', function () {
+    const messageForm = document.getElementById('message-form');
+    const messageInput = document.getElementById('message-input');
+    const messagesDiv = document.getElementById('messages');
+    let recipientId = null;
+
+    document.querySelectorAll('.message-button').forEach(button => {
+        button.addEventListener('click', function () {
+            document.querySelectorAll('.message-button').forEach(btn => btn.classList.remove('active'));
+            this.classList.add('active');
+            recipientId = this.dataset.user;
         });
     });
+
+    messageForm.addEventListener('submit', function (e) {
+        e.preventDefault();
+        const messageText = messageInput.value.trim();
+        if (messageText === '' || recipientId === null) return;
+
+        fetch("{% url 'send_message' 0 %}".replace('0', recipientId), {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+            body: JSON.stringify({ message: messageText, recipient: recipientId })
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            // Append the new message to the messages div
+            const messageElement = document.createElement('div');
+            messageElement.className = 'message';
+            messageElement.innerHTML = `
+                <strong>To:</strong> ${data.recipient.username}<br>
+                ${data.text}<br>
+                <small>${data.timestamp}</small>
+                <hr>
+            `;
+            messagesDiv.appendChild(messageElement);
+
+            // Scroll to the bottom
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+
+            // Clear the input
+            messageInput.value = '';
+        })
+        .catch(error => console.error('Error:', error));
+    });
+
+    // Function to load messages from the server
+    function loadMessages() {
+        fetch("{% url 'get_messages' %}")
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            messagesDiv.innerHTML = '';
+            data.messages.forEach(message => {
+                const messageElement = document.createElement('div');
+                messageElement.className = 'message';
+                messageElement.innerHTML = `
+                    <strong>From:</strong> ${message.sender.username}<br>
+                    ${message.text}<br>
+                    <small>${message.timestamp}</small>
+                    <hr>
+                `;
+                messagesDiv.appendChild(messageElement);
+            });
+
+            // Scroll to the bottom
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        })
+        .catch(error => console.error('Error:', error));
+    }
+
+    // Load messages initially and set an interval to refresh them
+    loadMessages();
+    setInterval(loadMessages, 5000);
+});
 </script>
 
 {% endblock %}

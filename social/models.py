@@ -64,12 +64,14 @@ class Comment(models.Model):
         return f"Comment by {self.user.username} on {self.post.user.username}'s post"
 
 
-
 class Message(models.Model):
-    sender = models.ForeignKey(User, related_name='sent_messages', on_delete=models.CASCADE)
-    recipient = models.ForeignKey(User, related_name='received_messages', on_delete=models.CASCADE)
-    message_content = models.TextField()
+    sender = models.ForeignKey(User, related_name='sent_messages', on_delete=models.CASCADE,default="")
+    recipient = models.ForeignKey(User, related_name='received_messages', on_delete=models.CASCADE,default="")
+    text = models.TextField()
     timestamp = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"From {self.sender.username} to {self.recipient.username}: {self.text[:20]}"
 
 class Notification(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)

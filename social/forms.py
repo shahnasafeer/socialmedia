@@ -33,8 +33,6 @@ class AboutForm(forms.ModelForm):
 
 
 class PostForm(forms.ModelForm):
-    mentioned_users = forms.ModelMultipleChoiceField(queryset=User.objects.all(), required=False, widget=forms.CheckboxSelectMultiple)
-
     class Meta:
         model = Post
         fields = ['caption', 'image']
@@ -50,11 +48,10 @@ class CommentForm(forms.ModelForm):
         widgets = {
             'text': forms.Textarea(attrs={'class': 'comment-form-container', 'id': 'content', 'rows': 4, 'placeholder': 'Type your comment here...'}),
         }
-
 class MessageForm(forms.ModelForm):
     class Meta:
         model = Message
-        fields = ['recipient', 'message_content']
+        fields = ['text']
 
 class NotificationForm(forms.ModelForm):
     class Meta:

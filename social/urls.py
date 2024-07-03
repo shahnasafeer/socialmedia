@@ -2,7 +2,7 @@ from django.urls import path
 from .views import (
     IndexView, LoginView,SignOutView, ProfileView, NotificationView, SignUp,PostView,
     AddProfileView,AboutView,CommentView,SearchUsersView,LikePostView,
-    FollowUserView,DeletePostView,SendMessageView,InboxView,UsersListView
+    FollowUserView,DeletePostView,SendMessageView,InboxView,UsersListView,GetMessagesView,get_user_messages
 )
 urlpatterns = [
     path('', LoginView.as_view(), name='signin'),
@@ -25,7 +25,8 @@ urlpatterns = [
     path('follow_user/<int:user_id>/', FollowUserView.as_view(), name='follow_user'),
     path('posts/delete/<int:pk>/', DeletePostView.as_view(), name='delete_post'),
     path('inbox/', InboxView.as_view(), name='inbox'),
-    path('users/', UsersListView.as_view(), name='user_list'),  
+    path('users/', UsersListView.as_view(), name='users'),  
     path('send_message/<int:recipient_id>/', SendMessageView.as_view(), name='send_message'),
-
+    path('get_messages/', GetMessagesView.as_view(), name='get_messages'),
+    path('inbox/<int:user_id>/messages/', get_user_messages, name='get_user_messages'),
 ]

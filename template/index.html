@@ -3,29 +3,31 @@
 {% block content %}
 
     <!---------------------------MOdal Section  satrts------------------->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.6.0/css/bootstrap.min.css">
     <style>
         #messageList {
             list-style-type: none;
             padding: 0;
         }
-    
+
         #messageList li {
             margin-bottom: 10px;
             border-bottom: 1px solid #ccc;
             padding-bottom: 10px;
-            font-size: 18px; /* Adjust the font size as needed */
+            font-size: 18px;
         }
-    
+
         #messageList li img {
             margin-right: 10px;
             border-radius: 50%;
         }
-    
+
         #messageList li strong {
-            font-weight: bold; /* Make the username bold */
+            font-weight: bold;
         }
     </style>
-    
+</head>
+<body>
     <div class="modal fade" id="modalview">
         <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered">
             <div class="modal-content">
@@ -41,8 +43,9 @@
             </div>
         </div>
     </div>
-    
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.6.0/js/bootstrap.bundle.min.js"></script>
     <script>
         $(document).ready(function() {
             $('#modalview').on('shown.bs.modal', function (e) {
@@ -50,7 +53,8 @@
                     type: 'GET',
                     url: '/inbox/{{ request.user.id }}/messages/', // Adjusted URL to fetch messages for the current user
                     success: function(response) {
-                        $('#messageList').empty();  
+                        console.log(response); // Log the response
+                        $('#messageList').empty();
                         if (response.length === 0) {
                             $('#messageList').append('<li>No messages found.</li>');
                         } else {
@@ -58,24 +62,22 @@
                                 $('#messageList').append(
                                     '<li>' +
                                     '<img src="' + message.sender.profile.image.url + '" alt="' + message.sender.username + '" width="30" height="30">' +
-                                    '<a href="/profile/' + message.sender.username + '">' + message.sender.username + '</a><br>' +
+                                    '<a href="/profile/' + message.sender.username + '"><strong>' + message.sender.username + '</strong></a><br>' +
                                     message.message_content + '<br>' +
-                                    message.timestamp + 
+                                    '<small>' + message.timestamp + '</small>' +
                                     '</li>'
                                 );
                             });
                         }
                     },
                     error: function(xhr, status, error) {
-                        console.error(xhr.responseText);
+                        console.error(xhr.responseText); // Log the error response
                         $('#messageList').empty().append('<li>Error loading messages.</li>');
                     }
                 });
             });
         });
-    </script>
-    
-    
+    </script> 
     <!-------------------------------MOdal Ends---------------------------->
     <!-------------------------------------------Start Grids layout for lg-xl-3 columns and (xs-lg 1 columns)--------------------------------->
     <div class="container">
@@ -136,14 +138,20 @@
                         <div class="card-body">
                             <h5 class="card-title">Photos<small class="ml-2"><a href="#"></a></small></h5>
                             <div class="row">
-                                {% for post in index.user_post %}
-                                <div class="col-6 p-1">
-                                    <a href="{{ post.image.url }}" data-lightbox="id"><img src="{{ post.image.url }}" alt="img" class="img-fluid my-2"></a>
-                                    <p><a href="{% url 'edit_post' pk=post.pk %}"><i class="far fa-edit"></i></a>
-                                    <a href="{% url 'delete_post' pk=post.pk %}" class="text-danger"><i class="far fa-trash-alt"></i></a></p>
-                                </div>
-                                {% endfor %}
-                            </div>
+    {% for post in index.user_post %}
+    <div class="col-6 p-1">
+        {% if post.image %}
+            <a href="{{ post.image.url }}" data-lightbox="id"><img src="{{ post.image.url }}" alt="img" class="img-fluid my-2"></a>
+        {% else %}
+            <p>No image available</p>
+        {% endif %}
+        <p>
+            <a href="{% url 'edit_post' pk=post.pk %}"><i class="far fa-edit"></i></a>
+            <a href="{% url 'delete_post' pk=post.pk %}" class="text-danger"><i class="far fa-trash-alt"></i></a>
+        </p>
+    </div>
+    {% endfor %}
+</div>
                         </div>
                         
                         </div>

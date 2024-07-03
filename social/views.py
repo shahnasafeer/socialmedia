@@ -9,9 +9,13 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from .models import Post,Comment,Profile,About,Follow,Like,Notification,Mention,Message
 from django.contrib.auth.forms import AuthenticationForm,PasswordResetForm
 from django.contrib.auth.models import User
-from .forms import SignInForm, CustomUserCreationForm,PostForm,AboutForm,ProfilePicForm,CommentForm
+from .forms import SignInForm, CustomUserCreationForm,PostForm,AboutForm,ProfilePicForm,CommentForm,MessageForm
 from django.views import View
 import logging
+import json
+from django.contrib.auth.decorators import login_required
+from django.views.decorators.csrf import csrf_exempt
+from django.utils.decorators import method_decorator
 
 class IndexView(View):
     def get(self, request):
@@ -202,10 +206,10 @@ class PostView(View):
             form = PostForm()
             user_posts = Post.objects.filter(userid=request.user)
             return render(request, 'posts.html', {'form': form, 'user_posts': user_posts})
+
     def post(self, request, pk=None):
-        instance_id = request.POST.get('instance')
-        if instance_id:
-            instance = Post.objects.get(pk=instance_id)
+        if pk:
+            instance = Post.objects.get(pk=pk)
             form = PostForm(request.POST, request.FILES, instance=instance)
         else:
             form = PostForm(request.POST, request.FILES)
@@ -214,8 +218,8 @@ class PostView(View):
             post = form.save(commit=False)
             post.userid = request.user
             post.save()
-            post.create_notifications()  
-            form.save_m2m()  
+            post.create_notifications()
+            form.save_m2m()
             messages.success(request, 'Post submitted successfully!')
             return redirect('index')
         else:
@@ -316,10 +320,14 @@ class SearchUsersView(View):
 
 class UsersListView(LoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
-        users = User.objects.exclude(id=request.user.id)
-        send_messages = Message.objects.filter(recipient=request.user)
-        return render(request,'all_users_list.html', {'users': users, 'send_message': send_messages})
-
+        send_messages = Message.objects.filter(sender=request.user)
+        receive_messages = Message.objects.filter(recipient=request.user)
+        users = User.objects.exclude(id=request.user.id)  # Fetch all users except the logged-in user
+        return render(request, 'all_users_list.html', {
+            'send_messages': send_messages,
+            'receive_messages': receive_messages,
+            'users': users,
+        })
 class SendMessageView(LoginRequiredMixin, CreateView):
     model = Message
     fields = ['message_content']
@@ -336,19 +344,12 @@ class SendMessageView(LoginRequiredMixin, CreateView):
         form.instance.sender = self.request.user
         form.instance.recipient = get_object_or_404(User, id=self.kwargs['recipient_id'])
         return super().form_valid(form)
-class InboxView(LoginRequiredMixin, ListView):
-    model = Message
-    context_object_name = 'messages'
-    template_name = 'inbox.html'
-
-    def get_queryset(self):
-        return Message.objects.filter(recipient=self.request.user).exclude(sender=self.request.user)
-
-def user_messages(request, recipient_id):
-    if request.user.id != recipient_id:
+@login_required
+def get_user_messages(request, user_id):
+    if request.user.id != user_id:
         return JsonResponse({'error': 'Unauthorized'}, status=403)
     
-    messages = Message.objects.filter(recipient_id=recipient_id, sender_id__ne=request.user.id)
+    messages = Message.objects.filter(recipient_id=user_id).exclude(sender_id=request.user.id)
     return JsonResponse([{
         'sender': {
             'username': message.sender.username,
@@ -358,6 +359,69 @@ def user_messages(request, recipient_id):
                 }
             }
         },
-        'message_content': message.message_content,
+        'message_content': message.text,
         'timestamp': message.timestamp.strftime('%Y-%m-%d %H:%M:%S')
     } for message in messages], safe=False)
+
+class GetMessagesView(LoginRequiredMixin, View):
+    def get(self, request, *args, **kwargs):
+        messages = Message.objects.filter(recipient=request.user).values('recipient_id', 'sender_id', 'text', 'timestamp')
+        messages_list = list(messages)
+        return JsonResponse({'messages': messages_list})
+
+class InboxView(LoginRequiredMixin, ListView):
+    model = Message
+    context_object_name = 'messages'
+    template_name = 'inbox.html'
+
+    def get_queryset(self):
+        return Message.objects.filter(recipient=self.request.user).exclude(sender=self.request.user)
+
+@login_required
+def user_messages(request, recipient_id):
+    if request.user.id != recipient_id:
+        return JsonResponse({'error': 'Unauthorized'}, status=403)
+    
+    messages = Message.objects.filter(recipient_id=recipient_id, sender__ne=request.user)
+    return JsonResponse([{
+        'sender': {
+            'username': message.sender.username,
+            'profile': {
+                'image': {
+                    'url': message.sender.profile.image.url
+                }
+            }
+        },
+        'message_content': message.text,  # Ensure this matches the field name in your model
+        'timestamp': message.timestamp.strftime('%Y-%m-%d %H:%M:%S')
+    } for message in messages], safe=False)
+
+
+class SendMessageView(LoginRequiredMixin, View):
+    def post(self, request, *args, **kwargs):
+        data = json.loads(request.body)
+        recipient_id = kwargs.get('recipient_id')
+        message_text = data.get('message')
+
+        # Ensure recipient_id and message_text are provided
+        if not recipient_id or not message_text:
+            return JsonResponse({'error': 'Invalid data'}, status=400)
+
+        try:
+            recipient = User.objects.get(id=recipient_id)
+        except User.DoesNotExist:
+            return JsonResponse({'error': 'Recipient not found'}, status=404)
+
+        message = Message.objects.create(
+            sender=request.user,
+            recipient=recipient,
+            text=message_text
+        )
+
+        return JsonResponse({
+            'sender': {'username': request.user.username},
+            'recipient': {'username': recipient.username},
+            'text': message.text,
+            'timestamp': message.timestamp.strftime('%Y-%m-%d %H:%M:%S')
+        })
+    

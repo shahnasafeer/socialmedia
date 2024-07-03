@@ -202,12 +202,12 @@
                         <h5 class="mb-3 card-title"><a href="{% url 'add_profile' %}" class="ml-1">Add</a></h5>                          
                         {% endif %}  
                         <ul class="list-unstyled nav justify-content-center">
-                                <a href="#" class="text-dark text-decoration-none">
-                                    <li class="nav-item">Friends <br> <strong>12M</strong></li>
-                                </a>
-                                <a href="#" class="text-dark text-decoration-none">
-                                    <li class="nav-item">Enemies <br> <strong>1</strong></li>
-                                </a>
+                            <a href="#" class="text-dark text-decoration-none">
+                                <li class="nav-item mb-3">Followers  <br> <strong>{{ request.user.followers.count }}</strong></li>
+                            </a>
+                            <a href="#" class="text-dark text-decoration-none">
+                                <li class="nav-item">Following <br> <strong>{{ request.user.following.count }}</strong></li>
+                            </a>
                             </ul>
                         </div>
                     </div>
