@@ -48,10 +48,20 @@ class IndexView(View):
         context['suggested_users'] = suggested_users
         return context
 class ProfileView(LoginRequiredMixin, View):
-    def get(self, request):
-        user_posts = Post.objects.filter(userid=request.user)
-        post_count = request.user.post_set.count()
-        return render(request,'profile.html', {'user_posts': user_posts, 'post_count': post_count})
+    def get(self, request, *args, **kwargs):
+        username = kwargs.get('username')
+        if username:
+            user = get_object_or_404(User, username=username)
+        else:
+            user = request.user
+
+        user_posts = Post.objects.filter(userid=user)
+        post_count = user.post_set.count()
+        return render(request, 'profile.html', {
+            'user_posts': user_posts,
+            'post_count': post_count,
+            'profile_user': user
+        })
 
 class NotificationView(View):
     def get(self, request):
@@ -171,16 +181,27 @@ class EditAboutView(View):
 class AddProfileView(View):
     def get(self, request, pk=None):
         if pk is not None:
-            instance1 = Profile.objects.get(pk=pk)
-            form = ProfilePicForm(instance=instance1)
-            return render(request, 'user_profile.html', {'form': form, 'instance': instance1})
+            instance = Profile.objects.get(pk=pk)
+            form = ProfilePicForm(instance=instance)
         else:
             form = ProfilePicForm()
-            data = Profile.objects.all()
-            return render(request, 'user_profile.html', {'form': form, 'data': data})
+        
+        data = Profile.objects.all()  
+        
+        about_data = About.objects.filter(userid=request.user)
+        user_post = Post.objects.filter(userid=request.user)
+        suggested_users = User.objects.exclude(pk=request.user.pk)
+        
+        return render(request, 'user_profile.html', {
+            'form': form,
+            'data': data,
+            'about_data': about_data,
+            'user_post': user_post,
+            'suggested_users': suggested_users
+        })
    
     def post(self, request, pk=None):
-        instance_id = request.POST.get('instance')
+        instance_id = request.POST.get('instance')  
         if instance_id:
             instance = Profile.objects.get(pk=instance_id)
             form = ProfilePicForm(request.POST, request.FILES, instance=instance)
@@ -193,26 +214,40 @@ class AddProfileView(View):
             profile.save()
             return redirect('index')
         else:
-            data = Profile.objects.all()
-            return render(request, 'user_profile.html', {'form': form, 'data': data})
-
+            data = Profile.objects.all()  
+            about_data = About.objects.filter(userid=request.user)
+            user_post = Post.objects.filter(userid=request.user)
+            suggested_users = User.objects.exclude(pk=request.user.pk)
+            return render(request, 'user_profile.html', {
+                'form': form,
+                'data': data,
+                'about_data': about_data,
+                'user_post': user_post,
+                'suggested_users': suggested_users
+            })
 class PostView(View):
     def get(self, request, pk=None):
+        form = PostForm()
+        user_posts = Post.objects.filter(userid=request.user)
+        about_data = About.objects.filter(userid=request.user)
+        suggested_users = User.objects.exclude(pk=request.user.pk)
+
         if pk is not None:
-            instance = Post.objects.get(pk=pk)
+            instance = get_object_or_404(Post, pk=pk)
             form = PostForm(instance=instance)
-            return render(request, 'posts.html', {'form': form, 'instance': instance})
-        else:
-            form = PostForm()
-            user_posts = Post.objects.filter(userid=request.user)
-            return render(request, 'posts.html', {'form': form, 'user_posts': user_posts})
+            return render(request, 'posts.html', {'form': form, 'instance': instance, 'user_posts': user_posts, 'about_data': about_data, 'suggested_users': suggested_users})
+
+        return render(request, 'posts.html', {'form': form, 'user_posts': user_posts, 'about_data': about_data, 'suggested_users': suggested_users})
 
     def post(self, request, pk=None):
+        form = PostForm(request.POST, request.FILES)
+        user_posts = Post.objects.filter(userid=request.user)
+        about_data = About.objects.filter(userid=request.user)
+        suggested_users = User.objects.exclude(pk=request.user.pk)
+
         if pk:
-            instance = Post.objects.get(pk=pk)
+            instance = get_object_or_404(Post, pk=pk)
             form = PostForm(request.POST, request.FILES, instance=instance)
-        else:
-            form = PostForm(request.POST, request.FILES)
 
         if form.is_valid():
             post = form.save(commit=False)
@@ -223,9 +258,7 @@ class PostView(View):
             messages.success(request, 'Post submitted successfully!')
             return redirect('index')
         else:
-            user_posts = Post.objects.filter(userid=request.user)
-            return render(request, 'posts.html', {'form': form, 'user_posts': user_posts})
-    
+            return render(request, 'posts.html', {'form': form, 'user_posts': user_posts, 'about_data': about_data, 'suggested_users': suggested_users})
 class DeletePostView(View):
     def get(self, request, pk):
         post = Post.objects.get(pk=pk)
@@ -316,13 +349,12 @@ class SearchUsersView(View):
                 data = [{'username': profile.username} for profile in results]
                 return JsonResponse(data, safe=False)
         return JsonResponse([], safe=False)
-################################################################
 
 class UsersListView(LoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
         send_messages = Message.objects.filter(sender=request.user)
         receive_messages = Message.objects.filter(recipient=request.user)
-        users = User.objects.exclude(id=request.user.id)  # Fetch all users except the logged-in user
+        users = User.objects.exclude(id=request.user.id)  
         return render(request, 'all_users_list.html', {
             'send_messages': send_messages,
             'receive_messages': receive_messages,
@@ -349,7 +381,7 @@ def get_user_messages(request, user_id):
     if request.user.id != user_id:
         return JsonResponse({'error': 'Unauthorized'}, status=403)
     
-    messages = Message.objects.filter(recipient_id=user_id).exclude(sender_id=request.user.id)
+    messages = Message.objects.filter(recipient_id=user_id).exclude(sender_id=request.user.id).order_by('-timestamp')
     return JsonResponse([{
         'sender': {
             'username': message.sender.username,
@@ -365,7 +397,7 @@ def get_user_messages(request, user_id):
 
 class GetMessagesView(LoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
-        messages = Message.objects.filter(recipient=request.user).values('recipient_id', 'sender_id', 'text', 'timestamp')
+        messages = Message.objects.filter(recipient=request.user).values('recipient_id', 'sender_id', 'text', 'timestamp').order_by('-timestamp')
         messages_list = list(messages)
         return JsonResponse({'messages': messages_list})
 
@@ -375,14 +407,15 @@ class InboxView(LoginRequiredMixin, ListView):
     template_name = 'inbox.html'
 
     def get_queryset(self):
-        return Message.objects.filter(recipient=self.request.user).exclude(sender=self.request.user)
+        return Message.objects.filter(recipient=self.request.user).exclude(sender=self.request.user).order_by('-timestamp')
 
 @login_required
 def user_messages(request, recipient_id):
     if request.user.id != recipient_id:
         return JsonResponse({'error': 'Unauthorized'}, status=403)
     
-    messages = Message.objects.filter(recipient_id=recipient_id, sender__ne=request.user)
+    messages = Message.objects.filter(recipient_id=recipient_id, sender__ne=request.user).order_by('-timestamp')
+    
     return JsonResponse([{
         'sender': {
             'username': message.sender.username,
@@ -392,10 +425,9 @@ def user_messages(request, recipient_id):
                 }
             }
         },
-        'message_content': message.text,  # Ensure this matches the field name in your model
+        'message_content': message.text,
         'timestamp': message.timestamp.strftime('%Y-%m-%d %H:%M:%S')
     } for message in messages], safe=False)
-
 
 class SendMessageView(LoginRequiredMixin, View):
     def post(self, request, *args, **kwargs):
@@ -403,7 +435,7 @@ class SendMessageView(LoginRequiredMixin, View):
         recipient_id = kwargs.get('recipient_id')
         message_text = data.get('message')
 
-        # Ensure recipient_id and message_text are provided
+      
         if not recipient_id or not message_text:
             return JsonResponse({'error': 'Invalid data'}, status=400)
 
@@ -425,3 +457,7 @@ class SendMessageView(LoginRequiredMixin, View):
             'timestamp': message.timestamp.strftime('%Y-%m-%d %H:%M:%S')
         })
     
+@login_required
+def get_new_message_count(request):
+    new_message_count = Message.objects.filter(recipient=request.user, is_read=False).count().order_by('-timestamp')
+    return JsonResponse({'new_message_count': new_message_count})

@@ -3,182 +3,81 @@
 {% block content %}
 
     <!---------------------------MOdal Section  satrts------------------->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.6.0/css/bootstrap.min.css">
+    <style>
+        #messageList {
+            list-style-type: none;
+            padding: 0;
+        }
 
+        #messageList li {
+            margin-bottom: 10px;
+            border-bottom: 1px solid #ccc;
+            padding-bottom: 10px;
+            font-size: 18px;
+        }
+
+        #messageList li img {
+            margin-right: 10px;
+            border-radius: 50%;
+        }
+
+        #messageList li strong {
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
     <div class="modal fade" id="modalview">
         <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered">
-
             <div class="modal-content">
-
-
                 <div class="modal-header">
                     <div class="modal-title h4">Messages</div>
-
                     <button type="button" class="close" data-dismiss="modal">&times;</button>
                 </div>
-
-
                 <div class="modal-body">
-
-
-                    <ul class="list-unstyled">
-
-
-                     <a href="#" class="text-decoration-none">
-                        <li class="media hover-media">
-                           
-                                <img src="{% static 'img/avatar-dhg.png' %}" alt="img" width="60px" height="60px" class="rounded-circle mr-3">
-
-                                <div class="media-body text-dark">
-                                        <h6 class="media-header">Jchob Thunder and <strong> 1 others</strong></h6>
-                                        <p class="media-text">Lorem ipsum dolor sit amet consectetur adipisicing elit.</p>
-
-                                </div>
-
-                        </li>
-                    </a>
-                    <hr class="my-3">
-
-
-                    
-                    <a href="#" class="text-decoration-none">
-                            <li class="media hover-media">
-                               
-                                    <img src="{% static 'img/avatar-fat.jpg' %}" alt="img" width="60px" height="60px" class="rounded-circle mr-3">
-    
-                                    <div class="media-body text-dark">
-                                            <h6 class="media-header">Mark Otto and <strong> 3 others</strong></h6>
-                                            <p class="media-text">Lorem ipsum dolor sit amet consectetur adipisicing elit.</p>
-    
-                                    </div>
-    
-                            </li>
-                        </a>
-
-
-                        <hr class="my-3">
-
-
-                        <a href="#" class="text-decoration-none">
-                            <li class="media hover-media">
-                               
-                                    <img src="{% static 'img/avatar-mdo.png' %}" alt="img" width="60px" height="60px" class="rounded-circle mr-3">
-    
-                                    <div class="media-body text-dark">
-                                            <h6 class="media-header">Archer andu and <strong> 5 others</strong></h6>
-                                            <p class="media-text">Lorem ipsum dolor sit amet consectetur adipisicing elit.</p>
-    
-                                    </div>
-    
-                            </li>
-                        </a>
-
-                        <hr class="my-3">
-
-
-                        <a href="#" class="text-decoration-none">
-                                <li class="media hover-media">
-                                   
-                                        <img src="{% static 'img/avatar-dhg.png' %}" alt="img" width="60px" height="60px" class="rounded-circle mr-3">
-        
-                                        <div class="media-body text-dark">
-                                                <h6 class="media-header">Jchob Thunder and <strong> 1 others</strong></h6>
-                                                <p class="media-text">Lorem ipsum dolor sit amet consectetur adipisicing elit.</p>
-        
-                                        </div>
-        
-                                </li>
-                            </a>
-                            <hr class="my-3">
-        
-        
-                            
-                            <a href="#" class="text-decoration-none">
-                                    <li class="media hover-media">
-                                       
-                                            <img src="{% static 'img/avatar-fat.jpg' %}" alt="img" width="60px" height="60px" class="rounded-circle mr-3">
-            
-                                            <div class="media-body text-dark">
-                                                    <h6 class="media-header">Mark Otto and <strong> 3 others</strong></h6>
-                                                    <p class="media-text">Lorem ipsum dolor sit amet consectetur adipisicing elit.</p>
-            
-                                            </div>
-            
-                                    </li>
-                                </a>
-        
-        
-                                <hr class="my-3">
-        
-        
-                                <a href="#" class="text-decoration-none">
-                                    <li class="media hover-media">
-                                       
-                                            <img src="{% static 'img/avatar-mdo.png' %}" alt="img" width="60px" height="60px" class="rounded-circle mr-3">
-            
-                                            <div class="media-body text-dark">
-                                                    <h6 class="media-header">Archer andu and <strong> 5 others</strong></h6>
-                                                    <p class="media-text">Lorem ipsum dolor sit amet consectetur adipisicing elit.</p>
-            
-                                            </div>
-            
-                                    </li>
-                                </a>
-
-                        
-                                <hr class="my-3">
-                                <a href="#" class="text-decoration-none">
-                                        <li class="media hover-media">
-                                           
-                                                <img src="{% static 'img/avatar-dhg.png' %}" alt="img" width="60px" height="60px" class="rounded-circle mr-3">
-                
-                                                <div class="media-body text-dark">
-                                                        <h6 class="media-header">Jchob Thunder and <strong> 1 others</strong></h6>
-                                                        <p class="media-text">Lorem ipsum dolor sit amet consectetur adipisicing elit.</p>
-                
-                                                </div>
-                
-                                        </li>
-                                    </a>
-                                    <hr class="my-3">
-                
-                
-                                    
-                                    <a href="#" class="text-decoration-none">
-                                            <li class="media hover-media">
-                                               
-                                                    <img src="{% static 'img/avatar-fat.jpg' %}" alt="img" width="60px" height="60px" class="rounded-circle mr-3">
-                    
-                                                    <div class="media-body text-dark">
-                                                            <h6 class="media-header">Mark Otto and <strong> 3 others</strong></h6>
-                                                            <p class="media-text">Lorem ipsum dolor sit amet consectetur adipisicing elit.</p>
-                    
-                                                    </div>
-                    
-                                            </li>
-                                        </a>
-                
-                
-                                        <hr class="my-3">
-                
-                
-                                        <a href="#" class="text-decoration-none">
-                                            <li class="media hover-media">
-                                               
-                                                    <img src="{% static 'img/avatar-mdo.png' %}" alt="img" width="60px" height="60px" class="rounded-circle mr-3">
-                    
-                                                    <div class="media-body text-dark">
-                                                            <h6 class="media-header">Archer andu and <strong> 5 others</strong></h6>
-                                                            <p class="media-text">Lorem ipsum dolor sit amet consectetur adipisicing elit.</p>
-                    
-                                                    </div>
-                    
-                                            </li>
-                                        </a>
-                    </ul>                   
+                    <ul class="list-unstyled" id="messageList">
+                        <li>No messages found.</li>
+                    </ul>
                 </div>
             </div>
         </div>
     </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.6.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('#modalview').on('shown.bs.modal', function (e) {
+                $.ajax({
+                    type: 'GET',
+                    url: '/inbox/{{ request.user.id }}/messages/', // Adjusted URL to fetch messages for the current user
+                    success: function(response) {
+                        console.log(response); // Log the response
+                        $('#messageList').empty();
+                        if (response.length === 0) {
+                            $('#messageList').append('<li>No messages found.</li>');
+                        } else {
+                            response.forEach(function(message) {
+                                $('#messageList').append(
+                                    '<li>' +
+                                    '<img src="' + message.sender.profile.image.url + '" alt="' + message.sender.username + '" width="30" height="30">' +
+                                    '<a href="/profile/' + message.sender.username + '"><strong>' + message.sender.username + '</strong></a><br>' +
+                                    message.message_content + '<br>' +
+                                    '<small>' + message.timestamp + '</small>' +
+                                    '</li>'
+                                );
+                            });
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.error(xhr.responseText); // Log the error response
+                        $('#messageList').empty().append('<li>Error loading messages.</li>');
+                    }
+                });
+            });
+        });
+    </script> 
     <!-------------------------------MOdal Ends---------------------------->
     <!-------------------------------------------Start Grids layout for lg-xl-3 columns and (xs-lg 1 columns)--------------------------------->
     <div class="container">
@@ -202,12 +101,12 @@
                         <h5 class="mb-3 card-title"><a href="{% url 'add_profile' %}" class="ml-1">Add</a></h5>                          
                         {% endif %}  
                         <ul class="list-unstyled nav justify-content-center">
-                                <a href="#" class="text-dark text-decoration-none">
-                                    <li class="nav-item">Friends <br> <strong>12M</strong></li>
-                                </a>
-                                <a href="#" class="text-dark text-decoration-none">
-                                    <li class="nav-item">Enemies <br> <strong>1</strong></li>
-                                </a>
+                            <a href="#" class="text-dark text-decoration-none">
+                                <li class="nav-item mb-3">Followers  <br> <strong>{{ request.user.followers.count }}</strong></li>
+                            </a>
+                            <a href="#" class="text-dark text-decoration-none">
+                                <li class="nav-item">Following <br> <strong>{{ request.user.following.count }}</strong></li>
+                            </a>
                             </ul>
                         </div>
                     </div>
@@ -217,9 +116,9 @@
 
                         <div class="card-body">
                             <h5 class="mb-3 card-title">About</h5>
-                            {% if index.about_data %}
-                            {% for about_instance in index.about_data %}
-                            <p class="card-text"><i class="fas fa-calendar-week mr-2"></i>{{ about_instance.went_to }}</p>
+                            {% if about_data %}
+                                {% for about_instance in about_data %}
+                                    <p class="card-text"><i class="fas fa-calendar-week mr-2"></i>{{ about_instance.went_to }}</p>
                                     <p class="card-text"><i class="far fa-building mr-2"></i>{{ about_instance.work_at }}</p>
                                     <p class="card-text"><i class="fas fa-home mr-2"></i>{{ about_instance.live_in }}</p>
                                     <p class="card-text"><i class="fas fa-map-marker mr-2"></i>{{ about_instance.from_where }}</p>
@@ -235,11 +134,15 @@
                             <div class="card-body">
                                 <h5 class="card-title">Photos<small class="ml-2"><a href="#">Edit</a></small></h5>
                                 <div class="row">
-                                    {% for post in index.user_post %}
-                                    <div class="col-6 p-1">
-                                        <a href="{{ post.image.url }}" data-lightbox="id"><img src="{{ post.image.url }}" alt="img" class="img-fluid my-2"></a>
-                                    </div>
-                                    {% endfor %}
+                                    {% for post in user_posts %}
+            <div class="col-6 p-1">
+                <a href="{{ post.image.url }}" data-lightbox="id"><img src="{{ post.image.url }}" alt="img" class="img-fluid my-2"></a>
+                <p>
+                    <a href="{% url 'edit_post' pk=post.pk %}"><i class="far fa-edit"></i></a>
+                    <a href="{% url 'delete_post' pk=post.pk %}" class="text-danger"><i class="far fa-trash-alt"></i></a>
+                </p>
+            </div>
+            {% endfor %}
                                 </div>
                         </div>
                         </div>
@@ -352,44 +255,25 @@
             <div class="card-body">
                 <h6 class="card-title">Suggested for You<a href="#" class="ml-1"></a></h6>
                 <div class="row no-gutters d-none d-lg-flex">
-                    {% for user in index.suggested_users %}
-                        {% if user != request.user and not user.is_superuser %}
-                        
-                            <div class="col-6 p-1">                                
-                                <a href="{% url 'profile' %}">
+                    {% for user in suggested_users %}
+                    {% if user != request.user and not user.is_superuser %}
+                        <div class="col-6 p-1">
+                            <a href="{% url 'profile' user.username %}">
                                 <img src="{{ user.profile.image.url }}" alt="Profile Picture" class="rounded-circle mb-4" width="80px" height="80px">
-                            </a></div>
-                            <div class="col-6 p-1 text-left">
-                                <h6>{{ user.username }}</h6>
-                                <a href="#" class="btn btn-outline-info btn-sm mb-3"><i class="fas fa-user-friends"></i>Follow </a>
-                            </div>
-                        {% endif %}
-                    {% endfor %}
+                            </a>
+                        </div>
+                        <div class="col-6 p-1 text-left">
+                            <h6>{{ user.username }}</h6>
+                            <a href="#" class="btn btn-outline-info btn-sm mb-3"><i class="fas fa-user-friends"></i> Follow</a>
+                        </div>
+                    {% endif %}
+                {% endfor %}
                 </div>
                     </div>
             </div>
 
         </div>
-        <div class="card shadow-sm">
-            <div class="card-body">
-                <p>&copy; 2018 Bootstrap
-                        <a href="#">About</a>
-                        <a href="#">Help</a>
-                        <a href="#">Terms</a>
-                        <a href="#">Privacy</a>
-                        <a href="#">Cookies</a>
-                        <a href="#">Ads </a>
-                        <a href="#">Info</a>
-                        <a href="#">Brand</a>
-                        <a href="#">Blog</a>
-                        <a href="#">Status</a>
-                        <a href="#">Apps</a>
-                        <a href="#">Jobs</a>
-                        <a href="#">Advertise</a>                              
-                </p>
-            </div>
-
-        </div>
+        
     </div>
             </div>
 </div>

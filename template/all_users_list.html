@@ -43,23 +43,20 @@
                                 <!-- Messenger -->
                                 <div id="messages" style="height: 300px; overflow-y: scroll;">
                                     <!-- Messages will appear here -->
-                                    
-                                    {% for message in send_messages %}
-                                        <div class="message">
-                                            <strong>To:</strong> {{ message.recipient.username }}<br>
-                                            {{ message.text }}<br>
-                                            <small>{{ message.timestamp }}</small>
-                                        </div>
-                                        <hr>
-                                    {% endfor %}
-
-                                    
-                                    {% for message in receive_messages %}
-                                        <div class="message">
-                                            <strong>From:</strong> {{ message.sender.username }}<br>
-                                            {{ message.text }}<br>
-                                            <small>{{ message.timestamp }}</small>
-                                        </div>
+                                    {% for message in messages %}
+                                        {% if message.sender == request.user %}
+                                            <div class="message">
+                                                <strong>To:</strong> {{ message.recipient.username }}<br>
+                                                {{ message.text }}<br>
+                                                <small>{{ message.timestamp }}</small>
+                                            </div>
+                                        {% else %}
+                                            <div class="message">
+                                                <strong>From:</strong> {{ message.sender.username }}<br>
+                                                {{ message.text }}<br>
+                                                <small>{{ message.timestamp }}</small>
+                                            </div>
+                                        {% endif %}
                                         <hr>
                                     {% endfor %}
                                 </div>
@@ -116,11 +113,14 @@ document.addEventListener('DOMContentLoaded', function () {
             return response.json();
         })
         .then(data => {
-            // Append the new message to the messages div
+            // Determine if the message is sent or received
+            const isSentMessage = data.sender.username === '{{ request.user.username }}';
+
+            // Create the message element based on message direction
             const messageElement = document.createElement('div');
             messageElement.className = 'message';
             messageElement.innerHTML = `
-                <strong>To:</strong> ${data.recipient.username}<br>
+                <strong>${isSentMessage ? 'To' : 'From'}:</strong> ${isSentMessage ? data.recipient.username : data.sender.username}<br>
                 ${data.text}<br>
                 <small>${data.timestamp}</small>
                 <hr>
@@ -148,10 +148,12 @@ document.addEventListener('DOMContentLoaded', function () {
         .then(data => {
             messagesDiv.innerHTML = '';
             data.messages.forEach(message => {
+                const isSentMessage = message.sender.username === '{{ request.user.username }}';
+
                 const messageElement = document.createElement('div');
                 messageElement.className = 'message';
                 messageElement.innerHTML = `
-                    <strong>From:</strong> ${message.sender.username}<br>
+                    <strong>${isSentMessage ? 'To' : 'From'}:</strong> ${isSentMessage ? message.recipient.username : message.sender.username}<br>
                     ${message.text}<br>
                     <small>${message.timestamp}</small>
                     <hr>

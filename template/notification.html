@@ -118,14 +118,15 @@
                         <div class="card-body">
                             <h5 class="card-title">Photos<small class="ml-2"><a href="#"></a></small></h5>
                             <div class="row">
-                                {% for post in notification.user_posts %}
-                                <div class="col-6 p-1">
-                                    <a href="{{ post.image.url }}" data-lightbox="id"><img src="{{ post.image.url }}" alt="img" class="img-fluid my-2"></a>
-                                    <p><a href="{% url 'edit_post' pk=post.pk %}"><i class="far fa-edit"></i></a>
-                                        
-                                        <a href="{% url 'delete_post' pk=post.pk %}" class="text-danger"><i class="far fa-trash-alt"></i></a></p>
-                                </div>
-                                {% endfor %}
+                                {% for post in user_posts %}
+                <div class="col-6 p-1">
+                    <a href="{{ post.image.url }}" data-lightbox="id"><img src="{{ post.image.url }}" alt="img" class="img-fluid my-2"></a>
+                    <p>
+                        <a href="{% url 'edit_post' pk=post.pk %}"><i class="far fa-edit"></i></a>
+                        <a href="{% url 'delete_post' pk=post.pk %}" class="text-danger"><i class="far fa-trash-alt"></i></a>
+                    </p>
+                </div>
+            {% endfor %}
                             </div>
                         </div>
                         
@@ -195,19 +196,19 @@
                                         <div class="card-body">
                                             <h6 class="card-title">Suggested for You<a href="#" class="ml-1"></a></h6>
                                             <div class="row no-gutters d-none d-lg-flex">
-                                                {% for user in notification.suggested_users %}
-                                                    {% if user != request.user and not user.is_superuser %}
-                                                    
-                                                        <div class="col-6 p-1">                                
-                                                            <a href="{% url 'profile' %}">
+                                                {% for user in suggested_users %}
+                                                {% if user != request.user and not user.is_superuser %}
+                                                    <div class="col-6 p-1">
+                                                        <a href="{% url 'profile' user.username %}">
                                                             <img src="{{ user.profile.image.url }}" alt="Profile Picture" class="rounded-circle mb-4" width="80px" height="80px">
-                                                        </a></div>
-                                                        <div class="col-6 p-1 text-left">
-                                                            <h6>{{ user.username }}</h6>
-                                                            <a href="#" class="btn btn-outline-info btn-sm mb-3"><i class="fas fa-user-friends"></i>Follow </a>
-                                                        </div>
-                                                    {% endif %}
-                                                {% endfor %}
+                                                        </a>
+                                                    </div>
+                                                    <div class="col-6 p-1 text-left">
+                                                        <h6>{{ user.username }}</h6>
+                                                        <a href="#" class="btn btn-outline-info btn-sm mb-3"><i class="fas fa-user-friends"></i> Follow</a>
+                                                    </div>
+                                                {% endif %}
+                                            {% endfor %}
                                             </div>
                                             </div>
                         

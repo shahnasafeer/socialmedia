@@ -1,13 +1,13 @@
 from django.urls import path
 from .views import (
     IndexView, LoginView,SignOutView, ProfileView, NotificationView, SignUp,PostView,
-    AddProfileView,AboutView,CommentView,SearchUsersView,LikePostView,
+    AddProfileView,AboutView,CommentView,SearchUsersView,LikePostView, get_new_message_count,
     FollowUserView,DeletePostView,SendMessageView,InboxView,UsersListView,GetMessagesView,get_user_messages
 )
 urlpatterns = [
     path('', LoginView.as_view(), name='signin'),
     path('index/', IndexView.as_view(), name='index'),
-    path('profile/<str:username>/', ProfileView.as_view(), name='profile'),
+    path('profile/<str:username>/', ProfileView.as_view(), name='profile'), 
     path('profile/',ProfileView.as_view(), name='profile'),
     path('notification/', NotificationView.as_view(), name='notification'),
     path('signup/', SignUp.as_view(), name='signup'),
@@ -29,4 +29,6 @@ urlpatterns = [
     path('send_message/<int:recipient_id>/', SendMessageView.as_view(), name='send_message'),
     path('get_messages/', GetMessagesView.as_view(), name='get_messages'),
     path('inbox/<int:user_id>/messages/', get_user_messages, name='get_user_messages'),
+    path('new_message_count/', get_new_message_count, name='new_message_count'),
+    
 ]
